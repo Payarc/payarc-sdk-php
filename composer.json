@@ -1,0 +1,32 @@
+{
+  "name": "payarc/payarc-sdk-php",
+  "description": "Payarc PHP Sdk",
+  "type": "library",
+  "minimum-stability": "dev",
+  "version": "1.0.0",
+  "keywords": [
+    "payarc",
+    "payment processing",
+    "api"
+  ],
+  "homepage": "https://payarc.com/",
+  "license": "MIT",
+  "require": {
+    "guzzlehttp/guzzle": "^7.5",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "ext-mbstring": "*",
+    "php": "^8.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Payarc\\PayarcSdkPhp\\": "lib/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Spas Tomov",
+      "email": "spas@payarc.com"
+    }
+  ]
+}
