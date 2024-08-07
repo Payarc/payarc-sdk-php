@@ -3,12 +3,16 @@
 namespace Payarc\PayarcSdkPhp\utils;
 
 use InvalidArgumentException;
-use Payarc\PayarcSdkPhp\utils\services\CoreServiceFactory;
+use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\ServerException;
+use Throwable;
 
 class PayarcClient
 {
-    private $coreServiceFactory;
-
+    private Client $client;
 
     private $url_map = [
         'prod'=> 'https://api.payarc.net',
@@ -25,14 +29,10 @@ class PayarcClient
         }
         $this->bearer_token = $bearer_token;
         $this->base_url = $this->url_map[$base_url] ?? $base_url;
-        $this->base_url .= ($api_version == '/v1/') ? '/v1/' : '/v' . trim($api_version, '/') . '/';
+        $this->base_url .= ($api_version === '/v1/') ? '/v1/' : '/v' . trim($api_version, '/') . '/';
         $this->version = $version;
         $this->bearer_token_agent = $bearer_token_agent;
-    }
-
-    public function __get($name)
-    {
-        return $this->getService($name);
+        $this->client = new Client();
     }
 
     public function getBaseUrl(): string
@@ -51,12 +51,17 @@ class PayarcClient
     {
         return $this->bearer_token_agent;
     }
-    public function getService($name): services\BaseService|services\BaseServiceFactory|null
-    {
-        if (null === $this->coreServiceFactory) {
-            $this->coreServiceFactory = new CoreServiceFactory($this);
-        }
 
-        return $this->coreServiceFactory->getService($name);
+
+    /**
+     * @throws GuzzleException
+     */
+    public function request($method, $path, $params, $headers)
+    {
+        return $this->client->request($method, $this->base_url . $path,[
+            'headers' => $headers,
+            ...$params
+        ]);
     }
+
 }
