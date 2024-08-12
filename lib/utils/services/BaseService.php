@@ -32,6 +32,11 @@ abstract class BaseService
     public function refundCharge($charge, $params){}
     public function getCharge($chargeId){}
 
+    //Customers
+    public function updateCustomer($customer, $cust_data=[]){}
+    public function addCardToCustomer($customerId, $cardData){}
+    public function addBankAccToCustomer($customerId, $accData){}
+
     public function addObjectId(&$obj)
     {
         $handleObject = function (&$obj) use (&$handleObject) {
@@ -39,31 +44,31 @@ abstract class BaseService
                 switch ($obj['object']) {
                     case 'Charge':
                         $obj['object_id'] = "ch_" . $obj['id'];
-                        $obj['create_refund'] = function ($params) use ($obj) {$this->refundCharge($obj, $params);};
+                        $obj['create_refund'] = function ($params) use ($obj) {return $this->refundCharge($obj, $params);};
                         break;
-//                    case 'customer':
-//                        $obj['object_id'] = "cus_" . $obj['customer_id'];
-//                        $obj['update'] = function () use ($obj) {$this->updateCustomer($obj);};
-//                        $obj['cards'] = [];
-//                        $obj['cards']['create'] = function () use ($obj) {$this->addCardToCustomer($obj);};
-//                        if (!isset($obj['bank_accounts'])) {
-//                            $obj['bank_accounts'] = [];
-//                        }
-//                        $obj['bank_accounts']['create'] = function () use ($obj) {$this->addBankAccToCustomer($obj);};
-//                        if (!isset($obj['charges'])) {
-//                            $obj['charges'] = [];
-//                        }
-//                        $obj['charges']['create'] = function () use ($obj) {$this->createCharge($obj);};
-//                        break;
-//                    case 'Token':
-//                        $obj['object_id'] = "tok_" . $obj['id'];
-//                        break;
-//                    case 'Card':
-//                        $obj['object_id'] = "card_" . $obj['id'];
-//                        break;
-//                    case 'BankAccount':
-//                        $obj['object_id'] = "bnk_" . $obj['id'];
-//                        break;
+                    case 'customer':
+                        $obj['object_id'] = "cus_" . $obj['customer_id'];
+                        $obj['update'] = function ($cust_data) use ($obj) {return $this->updateCustomer($obj, $cust_data);};
+                        $obj['cards'] = [];
+                        $obj['cards']['create'] = function ($cardData) use ($obj) {return $this->addCardToCustomer($obj, $cardData);};
+                        if (!isset($obj['bank_accounts'])) {
+                            $obj['bank_accounts'] = [];
+                        }
+                        $obj['bank_accounts']['create'] = function ($accData) use ($obj) {return $this->addBankAccToCustomer($obj, $accData);};
+                        if (!isset($obj['charges'])) {
+                            $obj['charges'] = [];
+                        }
+                        $obj['charges']['create'] = function ($charge_data) use ($obj) {return $this->createCharge($obj, $charge_data);};
+                        break;
+                    case 'Token':
+                        $obj['object_id'] = "tok_" . $obj['id'];
+                        break;
+                    case 'Card':
+                        $obj['object_id'] = "card_" . $obj['id'];
+                        break;
+                    case 'BankAccount':
+                        $obj['object_id'] = "bnk_" . $obj['id'];
+                        break;
                     case 'ACHCharge':
                         $obj['object_id'] = "ach_" . $obj['id'];
                         $obj['create_refund'] = function ($params) use ($obj) {$this->refundCharge($obj, $params);};

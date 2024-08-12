@@ -13,7 +13,7 @@ class ChargeService extends BaseService
     /**
      * @throws Exception
      */
-    public function create($obj, $charge_data=null)
+    public function create($obj, $charge_data = null)
     {
         return $this->createCharge($obj, $charge_data);
     }
@@ -29,10 +29,14 @@ class ChargeService extends BaseService
     /**
      * @throws Exception
      */
-    public function list($options=[]): array
+    public function list($options = []): array
     {
         return $this->listCharges($options);
     }
+
+    /**
+     * @throws Exception
+     */
     public function createRefund($charge, $params)
     {
         return $this->refundCharge($charge, $params);
@@ -97,7 +101,7 @@ class ChargeService extends BaseService
     private function normalizeIDs(&$charge_data, $id_prefixes): void
     {
         foreach ($id_prefixes as $key => $prefix_length) {
-            if (isset($charge_data[$key]) && str_starts_with($charge_data[$key], substr($key, 0, $prefix_length)."_" )) {
+            if (isset($charge_data[$key]) && str_starts_with($charge_data[$key], substr($key, 0, $prefix_length) . "_")) {
                 $charge_data[$key] = substr($charge_data[$key], $prefix_length + 1);
             }
         }
@@ -168,14 +172,64 @@ class ChargeService extends BaseService
                 'charges' => $charges,
                 'pagination' => $pagination
             ];
-        }catch (ClientException|ServerException $err) {
+        } catch (ClientException|ServerException $err) {
             throw new Exception($this->manageError(['source' => 'API List charges'], $err, true), $err->getCode());
         } catch (GuzzleException|Throwable $err) {
             throw new Exception($this->manageError(['source' => 'API List charges'], $err), $err->getCode());
         }
     }
-    public function refundCharge($charge, $params){
-        echo "Refund Charge: " . json_encode($charge) . "\n";
-        echo "Refund Params: " . json_encode($params) . "\n";
+
+    /**
+     * @throws Exception
+     */
+    public function refundCharge($charge, $params = [])
+    {
+        $achRegular = false;
+        $url = 'charges';
+        $msg = '';
+        $chargeId = is_array($charge) ? ($charge['object_id'] ?? $charge) : $charge;
+        try {
+            if (str_starts_with($chargeId, 'ch_')) {
+                $chargeId = substr($chargeId, 3);
+                $url = "$url/{$chargeId}/refunds";
+            }
+            if (str_starts_with($chargeId, 'ach_')) {
+                $achRegular = true;
+                $params = $this->getAchChargeParams($charge, $params);
+                $url = 'achcharges';
+                $msg = 'ACH';
+            }
+            $response = $this->client->request('POST', $url, [
+                'json' => $params
+            ], $this->headers);
+            $data = json_decode($response->getBody()->getContents(), true);
+            return !$achRegular ? $this->addObjectId($data['data']) : $response;
+        } catch (ClientException|ServerException $err) {
+            throw new Exception($this->manageError(['source' => "API Refund a $msg charge"], $err, true), $err->getCode());
+        } catch (GuzzleException|Throwable $err) {
+            throw new Exception($this->manageError(['source' => "API Refund a $msg charge"], $err), $err->getCode());
+        }
+
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getAchChargeParams($charge, $params = [])
+    {
+            if (!is_array($charge)) {
+                $charge = $this->getCharge($charge);
+            }
+            $params['type'] = 'credit';
+            $params['amount'] = $params['amount'] ?? $charge['amount'];
+            $params['sec_code'] = $params['sec_code'] ?? $charge['sec_code'];
+
+            if (isset($charge['bank_account']['data']['object_id'])) {
+                $params['bank_account_id'] = $params['bank_account_id'] ?? $charge['bank_account']['data']['object_id'];
+            }
+            if (isset($params['bank_account_id']) && str_starts_with($params['bank_account_id'], 'bnk_')) {
+                $params['bank_account_id'] = substr($params['bank_account_id'], 4);
+            }
+            return $params;
     }
 }
