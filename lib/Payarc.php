@@ -3,6 +3,7 @@
 namespace Payarc\PayarcSdkPhp;
 use InvalidArgumentException;
 use Payarc\PayarcSdkPhp\utils\PayarcClient;
+use Payarc\PayarcSdkPhp\utils\services\BaseService;
 use Payarc\PayarcSdkPhp\utils\services\CoreServiceFactory;
 use Payarc\PayarcSdkPhp\utils\services\BaseServiceFactory;
 

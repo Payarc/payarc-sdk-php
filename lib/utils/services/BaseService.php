@@ -37,6 +37,15 @@ abstract class BaseService
     public function addCardToCustomer($customerId, $cardData){}
     public function addBankAccToCustomer($customerId, $accData){}
 
+    //Applications
+    public function retrieveApplicant($applicant){}
+    public function updateApplicant($obj, $newData){}
+    public function deleteApplicant($applicant){}
+    public function addApplicantDocument($applicant, $params){}
+    public function deleteApplicantDocument($document){}
+    public function submitApplicantForSignature($applicant){}
+    public function subAgents(){}
+
     public function addObjectId(&$obj)
     {
         $handleObject = function (&$obj) use (&$handleObject) {
@@ -71,29 +80,29 @@ abstract class BaseService
                         break;
                     case 'ACHCharge':
                         $obj['object_id'] = "ach_" . $obj['id'];
-                        $obj['create_refund'] = function ($params) use ($obj) {$this->refundCharge($obj, $params);};
+                        $obj['create_refund'] = function ($params) use ($obj) {return $this->refundCharge($obj, $params);};
                         break;
-//                    case 'ApplyApp':
-//                        $obj['object_id'] = "appl_" . $obj['id'];
-//                        $obj['retrieve'] = function () use ($obj) {$this->retrieveApplicant($obj);};
-//                        $obj['delete'] = function () use ($obj) {$this->deleteApplicant($obj);};
-//                        $obj['add_document'] = function () use ($obj) {$this->addApplicantDocument($obj);};
-//                        $obj['submit'] = function () use ($obj) {$this->submitApplicantForSignature($obj);};
-//                        $obj['update'] = function () use ($obj) {$this->updateApplicant($obj);};
-//                        $obj['list_sub_agents'] = function () use ($obj) {$this->subAgents($obj);};
-//                        break;
-//                    case 'ApplyDocuments':
-//                        $obj['object_id'] = "doc_" . $obj['id'];
-//                        $obj['delete'] = function () use ($obj) {$this->deleteApplicantDocument($obj);};
-//                        break;
+                    case 'ApplyApp':
+                        $obj['object_id'] = "appl_" . $obj['id'];
+                        $obj['retrieve'] = function () use ($obj) {return $this->retrieveApplicant($obj);};
+                        $obj['delete'] = function () use ($obj) {return $this->deleteApplicant($obj);};
+                        $obj['add_document'] = function ($params) use ($obj) {return $this->addApplicantDocument($obj, $params);};
+                        $obj['submit'] = function () use ($obj) {return $this->submitApplicantForSignature($obj);};
+                        $obj['update'] = function ($newData) use ($obj) {return $this->updateApplicant($obj, $newData);};
+                        $obj['list_sub_agents'] = function () {return $this->subAgents();};
+                        break;
+                    case 'ApplyDocuments':
+                        $obj['object_id'] = "doc_" . $obj['id'];
+                        $obj['delete'] = function () use ($obj) {return $this->deleteApplicantDocument($obj);};
+                        break;
 //                    case 'Campaign':
 //                        $obj['object_id'] = "cmp_" . $obj['id'];
 //                        $obj['update'] = function () use ($obj) {$this->updateCampaign($obj);};
 //                        $obj['retrieve'] = function () use ($obj) {$this->getCampaign($obj);};
 //                        break;
-//                    case 'User':
-//                        $obj['object_id'] = "usr_" . $obj['id'];
-//                        break;
+                    case 'User':
+                        $obj['object_id'] = "usr_" . $obj['id'];
+                        break;
 //                    case 'Subscription':
 //                        $obj['object_id'] = "sub_" . $obj['id'];
 //                        $obj['cancel'] = function () use ($obj) {$this->cancelSubscription($obj);};
@@ -105,29 +114,17 @@ abstract class BaseService
 //                        break;
                 }
             }
-//           elseif (isset($obj['MerchantCode'])) {
-//                $obj['object_id'] = "appl_" . $obj['MerchantCode'];
-//                $obj['object'] = 'ApplyApp';
-//                unset($obj['MerchantCode']);
-//                $obj['retrieve'] = function () use ($obj) {
-//                    $this->retrieveApplicant($obj);
-//                };
-//                $obj['delete'] = function () use ($obj) {
-//                    $this->deleteApplicant($obj);
-//                };
-//                $obj['add_document'] = function () use ($obj) {
-//                    $this->addApplicantDocument($obj);
-//                };
-//                $obj['submit'] = function () use ($obj) {
-//                    $this->submitApplicantForSignature($obj);
-//                };
-//                $obj['update'] = function () use ($obj) {
-//                    $this->updateApplicant($obj);
-//                };
-//                $obj['list_sub_agents'] = function () use ($obj) {
-//                    $this->subAgents($obj);
-//                };
-//            } elseif (isset($obj['plan_id'])) {
+           elseif (isset($obj['MerchantCode'])) {
+                $obj['object_id'] = "appl_" . $obj['MerchantCode'];
+                $obj['object'] = 'ApplyApp';
+                unset($obj['MerchantCode']);
+                $obj['retrieve'] = function () use ($obj) {return $this->retrieveApplicant($obj);};
+                $obj['delete'] = function () use ($obj) {return $this->deleteApplicant($obj);};
+                $obj['add_document'] = function ($params) use ($obj) {return $this->addApplicantDocument($obj, $params);};
+                $obj['submit'] = function () use ($obj) {return $this->submitApplicantForSignature($obj);};
+                $obj['update'] =  function ($newData) use ($obj) {return $this->updateApplicant($obj, $newData);};
+                $obj['list_sub_agents'] = function () {return $this->subAgents();};
+            } elseif (isset($obj['plan_id'])) {
 //                $obj['object_id'] = $obj['plan_id'];
 //                $obj['object'] = 'Plan';
 //                unset($obj['plan_id']);
@@ -143,7 +140,7 @@ abstract class BaseService
 //                $obj['create_subscription'] = function () use ($obj) {
 //                    $this->createSubscription($obj);
 //                };
-//            }
+            }
 
             foreach ($obj as $key => &$value) {
                 if (is_array($value)) {

@@ -9,7 +9,8 @@ class CoreServiceFactory extends BaseServiceFactory
      */
     private static $classMap = [
         'charges' => ChargeService::class,
-        'customers' => CustomerService::class
+        'customers' => CustomerService::class,
+        'applications' => ApplicationService::class,
     ];
 
     protected function getServiceClass($name): ?string
