@@ -46,6 +46,20 @@ abstract class BaseService
     public function submitApplicantForSignature($applicant){}
     public function subAgents(){}
 
+    //Campaigns
+    protected function getCampaign($key){}
+    protected function updateCampaign($data, $newData){}
+
+    //Plans
+    protected function getPlan($planId){}
+    protected function updatePlan($plan, $newData){}
+    protected function deletePlan($params){}
+    protected function createSubscription($plan, $newData){}
+
+    //Subscriptions
+    protected function cancelSubscription($subscription){}
+    protected function updateSubscription($subscription, $newData){}
+
     public function addObjectId(&$obj)
     {
         $handleObject = function (&$obj) use (&$handleObject) {
@@ -95,19 +109,19 @@ abstract class BaseService
                         $obj['object_id'] = "doc_" . $obj['id'];
                         $obj['delete'] = function () use ($obj) {return $this->deleteApplicantDocument($obj);};
                         break;
-//                    case 'Campaign':
-//                        $obj['object_id'] = "cmp_" . $obj['id'];
-//                        $obj['update'] = function () use ($obj) {$this->updateCampaign($obj);};
-//                        $obj['retrieve'] = function () use ($obj) {$this->getCampaign($obj);};
-//                        break;
+                    case 'Campaign':
+                        $obj['object_id'] = "cmp_" . $obj['id'];
+                        $obj['update'] = function ($new_data) use ($obj) {return $this->updateCampaign($obj, $new_data);};
+                        $obj['retrieve'] = function () use ($obj) {return $this->getCampaign($obj);};
+                        break;
                     case 'User':
                         $obj['object_id'] = "usr_" . $obj['id'];
                         break;
-//                    case 'Subscription':
-//                        $obj['object_id'] = "sub_" . $obj['id'];
-//                        $obj['cancel'] = function () use ($obj) {$this->cancelSubscription($obj);};
-//                        $obj['update'] = function () use ($obj) {$this->updateSubscription($obj);};
-//                        break;
+                    case 'Subscription':
+                        $obj['object_id'] = "sub_" . $obj['id'];
+                        $obj['cancel'] = function () use ($obj) {return $this->cancelSubscription($obj);};
+                        $obj['update'] = function ($newData) use ($obj) {return $this->updateSubscription($obj, $newData);};
+                        break;
 //                    case 'Cases':
 //                        $obj['object'] = 'Dispute';
 //                        $obj['object_id'] = "dis_" . $obj['id'];
@@ -125,21 +139,13 @@ abstract class BaseService
                 $obj['update'] =  function ($newData) use ($obj) {return $this->updateApplicant($obj, $newData);};
                 $obj['list_sub_agents'] = function () {return $this->subAgents();};
             } elseif (isset($obj['plan_id'])) {
-//                $obj['object_id'] = $obj['plan_id'];
-//                $obj['object'] = 'Plan';
-//                unset($obj['plan_id']);
-//                $obj['retrieve'] = function () use ($obj) {
-//                    $this->getPlan($obj);
-//                };
-//                $obj['update'] = function () use ($obj) {
-//                    $this->updatePlan($obj);
-//                };
-//                $obj['delete'] = function () use ($obj) {
-//                    $this->deletePlan($obj);
-//                };
-//                $obj['create_subscription'] = function () use ($obj) {
-//                    $this->createSubscription($obj);
-//                };
+                $obj['object_id'] = $obj['plan_id'];
+                $obj['object'] = 'Plan';
+                unset($obj['plan_id']);
+                $obj['retrieve'] = function () use ($obj) {return $this->getPlan($obj);};
+                $obj['update'] = function ($newData) use ($obj) {return $this->updatePlan($obj, $newData);};
+                $obj['delete'] = function () use ($obj) {return $this->deletePlan($obj);};
+                $obj['create_subscription'] = function ($newData) use ($obj) {$this->createSubscription($obj, $newData);};
             }
 
             foreach ($obj as $key => &$value) {
