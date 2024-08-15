@@ -3,7 +3,6 @@
   "description": "Payarc PHP Sdk",
   "type": "library",
   "minimum-stability": "dev",
-  "version": "1.3.0",
   "keywords": [
     "payarc",
     "payment processing",
@@ -12,12 +11,12 @@
   "homepage": "https://payarc.com/",
   "license": "MIT",
   "require": {
-    "guzzlehttp/guzzle": "^7.5",
+    "guzzlehttp/guzzle": "^7.9.x-dev",
     "ext-curl": "*",
     "ext-json": "*",
     "ext-mbstring": "*",
-    "php": "^8.0",
-    "symfony/dotenv": "6.4.x-dev"
+    "php": "^8.1",
+    "symfony/dotenv": "^6.4.x-dev"
   },
   "autoload": {
     "psr-4": {

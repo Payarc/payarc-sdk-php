@@ -51,13 +51,13 @@ abstract class BaseService
     protected function updateCampaign($data, $newData){}
 
     //Plans
-    protected function getPlan($planId){}
+    protected function getPlan($plan){}
     protected function updatePlan($plan, $newData){}
     protected function deletePlan($params){}
     protected function createSubscription($plan, $newData){}
 
     //Subscriptions
-    protected function cancelSubscription($subscription){}
+    protected function cancelSubscription($subscription) {}
     protected function updateSubscription($subscription, $newData){}
 
     public function addObjectId(&$obj)
@@ -145,7 +145,7 @@ abstract class BaseService
                 $obj['retrieve'] = function () use ($obj) {return $this->getPlan($obj);};
                 $obj['update'] = function ($newData) use ($obj) {return $this->updatePlan($obj, $newData);};
                 $obj['delete'] = function () use ($obj) {return $this->deletePlan($obj);};
-                $obj['create_subscription'] = function ($newData) use ($obj) {$this->createSubscription($obj, $newData);};
+                $obj['create_subscription'] = function ($newData) use ($obj) {return $this->createSubscription($obj, $newData);};
             }
 
             foreach ($obj as $key => &$value) {
