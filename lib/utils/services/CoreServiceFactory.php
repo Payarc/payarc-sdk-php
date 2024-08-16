@@ -15,7 +15,8 @@ class CoreServiceFactory extends BaseServiceFactory
         'billing' =>[
             'plan' => PlanService::class,
             'plan_subscription' => SubscriptionService::class,
-        ]
+        ],
+        'disputes' => DisputeService::class,
     ];
 
     public function __construct($client)

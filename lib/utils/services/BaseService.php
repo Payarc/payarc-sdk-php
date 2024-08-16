@@ -122,10 +122,10 @@ abstract class BaseService
                         $obj['cancel'] = function () use ($obj) {return $this->cancelSubscription($obj);};
                         $obj['update'] = function ($newData) use ($obj) {return $this->updateSubscription($obj, $newData);};
                         break;
-//                    case 'Cases':
-//                        $obj['object'] = 'Dispute';
-//                        $obj['object_id'] = "dis_" . $obj['id'];
-//                        break;
+                    case 'Cases':
+                        $obj['object'] = 'Dispute';
+                        $obj['object_id'] = "dis_" . $obj['id'];
+                        break;
                 }
             }
            elseif (isset($obj['MerchantCode'])) {
