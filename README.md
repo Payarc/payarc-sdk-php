@@ -19,10 +19,11 @@ PHP 8.1 or later.
 You can install the Payarc SDK using [composer](https://getcomposer.org/).Run the following command:
 
 > [!WARNING]
-> There is no stable version of this package yet. Use: **dev-master** for now.
+> There is no stable version of this package yet. Use this command to install the package.
 
 ```bash
-composer require payarc/payarc-php-sdk:dev-master
+composer config minimum-stability dev && composer require payarc/payarc-sdk-php:dev-master --prefer-stable && composer config --unset minimum-stability
+
 ```
 To use the bindings, use Composer's [autoload](https://getcomposer.org/doc/01-basic-usage.md#autoloading):
     
