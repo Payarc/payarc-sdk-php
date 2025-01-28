@@ -23,6 +23,7 @@ class PayarcConnectService extends BaseService
         $accessToken = $responseData['BearerTokenInfo']['AccessToken'] ?? null;
 
         if ($accessToken !== null) {
+            $this->client->setPayarcConnectAccessToken($accessToken);
             return $responseData;
         } else {
             $pcError = new Exception($responseData['ErrorMessage'], $responseData['ErrorCode']);
@@ -39,11 +40,12 @@ class PayarcConnectService extends BaseService
         $requestBody = [
             'TenderType' => $tenderType,
             'TransType' => "SALE",
-            'ECRRefNum'=> $ecrRefNum,
-            'Amount'=> $amount,
-            'DeviceSerialNo' => $deviceSerialNo];
-            
-        return $this->handleRequest('POST', 'sale', $requestBody);
+            'ECRRefNum' => $ecrRefNum,
+            'Amount' => $amount,
+            'DeviceSerialNo' => $deviceSerialNo
+        ];
+
+        return $this->handleRequest('POST', '/Transactions', $requestBody);
     }
 
     /**
@@ -129,14 +131,20 @@ class PayarcConnectService extends BaseService
             if ($errorCode === 0) {
                 return $responseData;
             } else {
-                $pcError = new Exception($responseData['ErrorMessage'], $responseData['ErrorCode']);
-                throw new Exception($this->manageError($seed, $pcError, false), $pcError->getCode());
+                $pcError = new PayarcConnectException($responseData['ErrorMessage'], $responseData['ErrorCode']);
+                throw new PayarcConnectException($this->manageError($seed, $pcError, false), $pcError->getCode());
             }
 
+        } catch (PayarcConnectException $err) {
+            throw $err;
         } catch (ClientException | ServerException $err) {
             throw new Exception($this->manageError($seed, $err, true), $err->getCode());
         } catch (GuzzleException | Throwable $err) {
             throw new Exception($this->manageError($seed, $err), $err->getCode());
         }
     }
+}
+
+class PayarcConnectException extends Exception
+{
 }
