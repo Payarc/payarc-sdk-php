@@ -18,15 +18,32 @@ class PayarcConnectService extends BaseService
         $requestBody = [
             'SecretKey' => $this->client->getBearerToken()
         ];
-        return $this->handleRequest('POST', '/Login', $requestBody);
+
+        $responseData = $this->handleRequest('POST', '/Login', $requestBody);
+        $accessToken = $responseData['BearerTokenInfo']['AccessToken'] ?? null;
+
+        if ($accessToken !== null) {
+            return $responseData;
+        } else {
+            $pcError = new Exception($responseData['ErrorMessage'], $responseData['ErrorCode']);
+            throw new Exception($this->manageError(['source' => "Payarc Connect Login"], $pcError, false), $pcError->getCode());
+        }
+
     }
 
     /**
      * @throws Exception
      */
-    public function sale($saleData)
+    public function sale($tenderType, $ecrRefNum, $amount, $deviceSerialNo)
     {
-        return $this->handleRequest('POST', 'sale', $saleData);
+        $requestBody = [
+            'TenderType' => $tenderType,
+            'TransType' => "SALE",
+            'ECRRefNum'=> $ecrRefNum,
+            'Amount'=> $amount,
+            'DeviceSerialNo' => $deviceSerialNo];
+            
+        return $this->handleRequest('POST', 'sale', $requestBody);
     }
 
     /**
@@ -105,16 +122,17 @@ class PayarcConnectService extends BaseService
             $response = $this->client->payarcConnectRequest($method, $endpoint, [
                 'json' => $data,
             ]);
-            $responseData = json_decode($response->getBody(), true);
-            $accessToken = $responseData['BearerTokenInfo']['AccessToken'] ?? null;
 
-            if ($accessToken !== null) {
+            $responseData = json_decode($response->getBody(), true);
+            $errorCode = $responseData['ErrorCode'] ?? -1;
+
+            if ($errorCode === 0) {
                 return $responseData;
             } else {
                 $pcError = new Exception($responseData['ErrorMessage'], $responseData['ErrorCode']);
                 throw new Exception($this->manageError($seed, $pcError, false), $pcError->getCode());
             }
-            
+
         } catch (ClientException | ServerException $err) {
             throw new Exception($this->manageError($seed, $err, true), $err->getCode());
         } catch (GuzzleException | Throwable $err) {
