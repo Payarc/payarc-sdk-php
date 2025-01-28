@@ -21,5 +21,60 @@ $payarc = new Payarc(
     version: $version
 );
 
-$result = $payarc->payarcConnect->login();
-print_r($result);
+/* $login = $payarc->payarcConnect->login();
+if ($login) {
+    $result = $payarc->payarcConnect->sale("CREDIT", "REF300", "150", "1850406725");
+    print_r($result);
+} */
+/* 
+$login = $payarc->payarcConnect->login();
+if ($login) {
+    $result = $payarc->payarcConnect->void("onDXOXonnbbonObL", "1850406725");
+    print_r($result);
+}
+ */
+/* $login = $payarc->payarcConnect->login();
+if ($login) {
+    $result = $payarc->payarcConnect->refund("15","DLbnOBLXXWyXoOoM", "1850406725");
+    print_r($result);
+}
+ */
+/* $login = $payarc->payarcConnect->login();
+if ($login) {
+    $result = $payarc->payarcConnect->refund("15","DLbnOBLXXWyXoOoM", "1850406725");
+    print_r($result);
+} */
+/* $login = $payarc->payarcConnect->login();
+if ($login) {
+    $result = $payarc->payarcConnect->blindCredit("REF31", "50", "IYmDAxNtma7g5228", "0227","1850406725");
+    print_r($result);
+}
+ */
+/* $login = $payarc->payarcConnect->login();
+if ($login) {
+    $result = $payarc->payarcConnect->auth("REF21", "1000","1850406725");
+    print_r($result);
+}
+ */
+/* $login = $payarc->payarcConnect->login();
+if ($login) {
+    $result = $payarc->payarcConnect->postAuth("REF212", "31", "500","1850406725");
+    print_r($result);
+}
+ */
+/* $login = $payarc->payarcConnect->login();
+if ($login) {
+    $result = $payarc->payarcConnect->lastTransaction("1850406725");
+    print_r($result);
+} */
+$login = $payarc->payarcConnect->login();
+if ($login) {
+    $result = $payarc->payarcConnect->serverInfo();
+    print_r($result);
+}
+/* $login = $payarc->payarcConnect->login();
+if ($login) {
+    $result = $payarc->payarcConnect->terminals();
+    print_r($result);
+}
+ */

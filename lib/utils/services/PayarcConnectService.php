@@ -51,49 +51,81 @@ class PayarcConnectService extends BaseService
     /**
      * @throws Exception
      */
-    public function void($voidData)
+    public function void($payarcTransactionId, $deviceSerialNo)
     {
-        return $this->handleRequest('POST', 'void', $voidData);
+        $requestBody = [
+            'TransType' => 'VOID',
+            'PayarcTransactionId' => $payarcTransactionId,
+            'DeviceSerialNo' => $deviceSerialNo
+        ];
+        return $this->handleRequest('POST', '/Transactions', $requestBody);
     }
 
     /**
      * @throws Exception
      */
-    public function refund($refundData)
+    public function refund($amount, $payarcTransactionId, $deviceSerialNo)
     {
-        return $this->handleRequest('POST', 'refund', $refundData);
+        $requestBody = [
+            'TransType' => 'REFUND',
+            'Amount' => $amount,
+            'PayarcTransactionId' => $payarcTransactionId,
+            'DeviceSerialNo' => $deviceSerialNo
+        ];
+        return $this->handleRequest('POST', '/Transactions', $requestBody);
     }
 
     /**
      * @throws Exception
      */
-    public function blindCredit($creditData)
+    public function blindCredit($ecrRefNum, $amount, $token, $expDate, $deviceSerialNo)
     {
-        return $this->handleRequest('POST', 'blindCredit', $creditData);
+        $requestBody = [
+            'TransType' => 'RETURN',
+            'ECRRefNum' => $ecrRefNum,
+            'Amount' => $amount,
+            'Token' => $token,
+            'ExpDate' => $expDate,
+            'DeviceSerialNo' => $deviceSerialNo,
+        ];
+        return $this->handleRequest('POST', '/Transactions', $requestBody);
     }
 
     /**
      * @throws Exception
      */
-    public function auth($authData)
+    public function auth($ecrRefNum, $amount, $deviceSerialNo)
     {
-        return $this->handleRequest('POST', 'auth', $authData);
+        $requestBody = [
+            'TransType' => 'AUTH',
+            'ECRRefNum' => $ecrRefNum,
+            'Amount' => $amount,
+            'DeviceSerialNo' => $deviceSerialNo,
+        ];
+        return $this->handleRequest('POST', '/Transactions', $requestBody);
     }
 
     /**
      * @throws Exception
      */
-    public function postAuth($postAuthData)
+    public function postAuth($ecrRefNum, $origRefNum, $amount, $deviceSerialNo)
     {
-        return $this->handleRequest('POST', 'postAuth', $postAuthData);
+        $requestBody = [
+            'TransType' => 'POSTAUTH',
+            'ECRRefNum' => $ecrRefNum,
+            'OrigRefNum' => $origRefNum,
+            'Amount' => $amount,
+            'DeviceSerialNo' => $deviceSerialNo,
+        ];
+        return $this->handleRequest('POST', '/Transactions', $requestBody);
     }
 
     /**
      * @throws Exception
      */
-    public function lastTransaction($transactionData)
+    public function lastTransaction($deviceSerialNo)
     {
-        return $this->handleRequest('POST', 'lastTransaction', $transactionData);
+        return $this->handleRequest('GET', '/LastTransaction?DeviceSerialNo=' . $deviceSerialNo, $deviceSerialNo);
     }
 
     /**
@@ -101,7 +133,7 @@ class PayarcConnectService extends BaseService
      */
     public function serverInfo()
     {
-        return $this->handleRequest('GET', 'serverInfo');
+        return $this->handleRequest('GET', '/ServerInfo', serverInfoBypass:true);
     }
 
     /**
@@ -109,7 +141,7 @@ class PayarcConnectService extends BaseService
      */
     public function terminals()
     {
-        return $this->handleRequest('GET', 'terminals');
+        return $this->handleRequest('GET', '/Terminals');
     }
 
     /**
@@ -117,7 +149,7 @@ class PayarcConnectService extends BaseService
      *
      * @throws Exception
      */
-    private function handleRequest($method, $endpoint, $data = [])
+    private function handleRequest($method, $endpoint, $data = [], $serverInfoBypass = false)
     {
         try {
             $seed = ['source' => "Payarc Connect $endpoint"];
@@ -127,11 +159,12 @@ class PayarcConnectService extends BaseService
 
             $responseData = json_decode($response->getBody(), true);
             $errorCode = $responseData['ErrorCode'] ?? -1;
+            $errorMessage = $responseData['ErrorMessage'] ?? 'unKnown';
 
-            if ($errorCode === 0) {
+            if ($serverInfoBypass || $errorCode === 0) {
                 return $responseData;
             } else {
-                $pcError = new PayarcConnectException($responseData['ErrorMessage'], $responseData['ErrorCode']);
+                $pcError = new PayarcConnectException($errorMessage, $errorCode);
                 throw new PayarcConnectException($this->manageError($seed, $pcError, false), $pcError->getCode());
             }
 
