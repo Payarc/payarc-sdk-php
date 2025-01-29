@@ -26,6 +26,10 @@ abstract class BaseService
     {
         return $this->getClient()->request($method, $path, $params, $headers);
     }
+    protected function payarcConnectRequest($method, $path, $params)
+    {
+        return $this->getClient()->payarcConnectRequest($method, $path, $params);
+    }
 
     // Charges
     public function createCharge($obj, $charge_data=null){}

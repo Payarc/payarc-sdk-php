@@ -877,4 +877,184 @@ try {
     echo "Error detected: " . $e->getMessage() . "\n";
 }
 ```
+
+# Payarc Connect
+The following functionality will pertain only to user who are utilizing the Payarc Connect integration:
+
+### Login
+This function must be called and completed before any other functionality can be used. 
+```php
+try {
+    $login = $payarc->payarcConnect->login();
+    echo "Result: " . print_r($result, true) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+
+```
+
+### Sale
+Initiate a sale remotely on your PAX terminal
+
+| Parameter | Usage |
+| --- | --- |
+| TenderType | CREDIT, DEBIT |
+| ECRRefNum | Unique code for this transaction provided by the user. This code will be used later for **voids.** |
+| Amount | Amount to capture. Format is $$$$$$$CC |
+| DeviceSerialNo | Serial number of your PAX terminal |
+```php
+try {
+    $result = $payarc->payarcConnect->sale(
+        tenderType: "CREDIT", 
+        ecrRefNum: "REF123", 
+        amount: "100", 
+        deviceSerialNo: "12345"
+    );
+    echo "Result: " . json_encode($result) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+
+### Void
+Initiate a void remotely on your PAX terminal
+
+| Parameter | Usage |
+| --- | --- |
+| PayarcTransactionId | Unique code of a previous transaction. Required to do a void. Charge ID on Payarc Portal. |
+| DeviceSerialNo | Serial number of your PAX terminal |
+```php
+try {
+    $result = $payarc->payarcConnect->void(
+        payarcTransactionId: "12345", 
+        deviceSerialNo: "12345"
+    );
+    echo "Result: " . json_encode($result) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+### Refund
+Initiate a refund remotely on your PAX terminal
+
+| Parameter | Usage |
+| --- | --- |
+| Amount | Amount to capture. Format is $$$$$$$CC |
+| PayarcTransactionId | Unique code of a previous transaction. Required to do a refund. Charge ID on Payarc Portal. |
+| DeviceSerialNo | Serial number of your PAX terminal |
+```php
+try {
+    $result = $payarc->payarcConnect->refund(
+        amount: "100", 
+        payarcTransactionId: "12345", 
+        deviceSerialNo: "12345"
+    );
+    echo "Result: " . json_encode($result) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+### Blind Credit
+Initiate a blind credit remotely on your PAX terminal
+
+| Parameter | Usage |
+| --- | --- |
+| ECRRefNum | Unique code for this transaction provided by the user. |
+| Amount | Amount to capture. Format is $$$$$$$CC |
+| Token | Required for Refund. Found in PaxResponse.ExtData |
+| ExpDate | Required for Refund. Found in PaxResponse.ExtData. Expiration date of card used in sale |
+| DeviceSerialNo | Serial number of your PAX terminal |
+```php
+try {
+    $result = $payarc->payarcConnect->blindCredit(
+        ecrRefNum: "REF123", 
+        amount: "100", 
+        token: "ABC123", 
+        expDate: "0000", 
+        deviceSerialNo: "12345"
+    );
+    echo "Result: " . json_encode($result) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+### Auth
+Initiate an auth remotely on your PAX terminal
+
+| Parameter | Usage |
+| --- | --- |
+| ECRRefNum | Unique code for this transaction provided by the user |
+| Amount | Amount to capture. Format is $$$$$$$CC |
+| DeviceSerialNo | Serial number of your PAX terminal |
+```php
+try {
+    $result = $payarc->payarcConnect->auth(
+        ecrRefNum: "REF123", 
+        amount: "100", 
+        deviceSerialNo: "12345"
+    );
+    echo "Result: " . json_encode($result) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+### Post Auth
+Initiate a post auth remotely on your PAX terminal
+
+| Parameter | Usage |
+| --- | --- |
+| ECRRefNum | Unique code for this transaction provided by the user |
+| OrigRefNum | This number is obtained from the paymentResponse object from an auth transaction. |
+| Amount | Amount to capture. Cannot exceed auth amount. If you need to exceed the auth amount, perform another sale and the auth will fall off. Format is $$$$$$$CC |
+| DeviceSerialNo | Serial number of your PAX terminal |
+```php
+try {
+    $result = $payarc->payarcConnect->postAuth(
+        ecrRefNum: "REF123", 
+        origRefNum: "123", 
+        amount: "100", 
+        deviceSerialNo: "12345"
+    );
+    echo "Result: " . json_encode($result) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+### Last Transaction
+Returns the response object from the last transaction
+
+```php
+try {
+    $result = $payarc->payarcConnect->lastTransaction(
+        deviceSerialNo: "12345"
+    );
+    echo "Result: " . json_encode($result) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+### Server Info
+ Returns the status of the server
+
+```php
+try {
+    $result = $payarc->payarcConnect->serverInfo();
+    echo "Result: " . json_encode($result) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+
+### Terminals
+Returns a list of registered terminal for merchant
+
+```php
+try {
+    $result = $payarc->payarcConnect->terminals();
+    echo "Result: " . json_encode($result) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+
 ## License [MIT](LICENSE)

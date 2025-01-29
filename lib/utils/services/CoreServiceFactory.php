@@ -17,6 +17,7 @@ class CoreServiceFactory extends BaseServiceFactory
             'plan_subscription' => SubscriptionService::class,
         ],
         'disputes' => DisputeService::class,
+        'payarcConnect' => PayarcConnectService::class,
     ];
 
     public function __construct($client)
