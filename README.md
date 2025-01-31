@@ -121,6 +121,7 @@ SDK is build around object payarc. From this object you can access properties an
     retrieve - this function extract details for specific customer from database
     list - this function allows you to search amongst customers you had created. It is possible to search based on some criteria. See examples and documentation for more details  
     update - this function allows you to modify attributes of customer object.
+    delete - this function allows you to delete customer object.
 
 ### Service `Payarc->applications`
 ##### Service `Payarc->applications` is used by Agents and ISVs to manage candidate merchant when acquiring new customer. As such you can create, list, get details, and manage documents required in boarding process.
@@ -457,6 +458,20 @@ try {
 } catch (Throwable $e) {
     echo "Error detected: " . $e->getMessage() . "\n";
 }
+```
+
+### Example: Delete Customer
+
+This example shows how to delete customer. See more details in API documentation.
+```php
+  try
+  {
+      $customer = $this->payarc->customers->delete($id);
+      echo "Customer deleted: " . json_encode($customer) . "\n";
+  } 
+  catch (Throwable $e) {
+      echo "Error detected: " . $e->getMessage() . "\n";
+  }
 ```
 
 ## Manage Candidate Merchants
