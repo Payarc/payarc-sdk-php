@@ -39,6 +39,11 @@ class CustomerService extends BaseService
     {
         return $this->listCustomers($searchData);
     }
+
+    public function delete($customer_id)
+    {
+        return $this->deleteCustomer($customer_id);
+    }
     /**
      * @throws Exception
      */
@@ -172,6 +177,27 @@ class CustomerService extends BaseService
             }
     }
 
+    /**
+     * @throws Exception
+     */
+    private function deleteCustomer($customer_id)
+    {
+        if (str_starts_with($customer_id, 'cus_')) {
+            $customer_id = substr($customer_id, 4);
+        }
+        try {
+            $response = $this->client->request('DELETE', "customers/$customer_id", [], $this->headers);
+            if ($response->getStatusCode() === 204) {
+                return null;
+            }
+            $data = json_decode($response->getBody()->getContents(), true);
+            return isset($data['data']) ? $this->addObjectId($data['data']) : null;
+        } catch (ClientException | ServerException $err) {
+            throw new Exception($this->manageError(['source' => 'API DELETE customer'], $err, true), $err->getCode());
+        } catch (GuzzleException | Throwable $err) {
+            throw new Exception($this->manageError(['source' => 'API DELETE customer'], $err), $err->getCode());
+        }
+    }
     /**
      * @throws Exception
      */
