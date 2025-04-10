@@ -76,6 +76,10 @@ class PayarcClient
      */
     public function request($method, $path, $params, $headers)
     {
+        if (!isset($headers['User-Agent']) || empty($headers['User-Agent']) || !substr(strtolower($headers['User-Agent']), 0, 7) != 'sdk-php') {
+            $headers['User-Agent'] = 'sdk-php/' . $this->getVersion();
+        }
+
         return $this->client->request($method, $this->base_url . $path,[
             'headers' => $headers,
             ...$params
@@ -91,6 +95,7 @@ class PayarcClient
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->getPayarcConnectAccessToken(),
                 'Content-Type' => 'application/json',
+                'User-Agent' => 'sdk-php/' . $this->getVersion()
             ],
             ...$params
         ]);
