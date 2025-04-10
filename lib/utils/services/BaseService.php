@@ -9,7 +9,7 @@ abstract class BaseService
     protected $client;
     protected array $headers = [
         'Content-Type' => 'application/json',
-        'Accept' => 'application/json',
+        'Accept' => 'application/json'
     ];
     public function __construct($client)
     {
@@ -24,6 +24,7 @@ abstract class BaseService
 
     protected function request($method, $path, $params, $headers)
     {
+        $headers['User-Agent'] = 'sdk-php/' . $this->getClient()->getVersion();
         return $this->getClient()->request($method, $path, $params, $headers);
     }
     protected function payarcConnectRequest($method, $path, $params)
