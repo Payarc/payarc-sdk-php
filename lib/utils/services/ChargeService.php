@@ -37,6 +37,22 @@ class ChargeService extends BaseService
     /**
      * @throws Exception
      */
+    public function listByAgentPayfac($options = []): array
+    {
+        return $this->listChargesByAgentPayfac($options);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function listByAgentTraditional($options = []): array
+    {
+        return $this->listChargesByAgentTraditional($options);
+    }
+
+    /**
+     * @throws Exception
+     */
     public function createRefund($charge, $params)
     {
         return $this->refundCharge($charge, $params);
@@ -178,6 +194,65 @@ class ChargeService extends BaseService
             throw new Exception($this->manageError(['source' => 'API List charges'], $err), $err->getCode());
         }
     }
+
+    /**
+     * @throws Exception
+     */
+    public function listChargesByAgentPayfac($searchData = []): array
+    {
+        $limit = $searchData['limit'] ?? 25;
+        $page = $searchData['page'] ?? 1;
+        $search = $searchData['search'] ?? [];
+        $params = array_merge(['limit' => $limit, 'page' => $page], $search);
+
+        try {
+            $response = $this->client->agentRequest('GET', 'agent-hub/merchant-bridge/charges', [
+                'query' => $params
+            ], $this->headers);
+            $data = json_decode($response->getBody(), true);
+            $charges = array_map([$this, 'addObjectId'], $data['data']);
+            $pagination = $data['meta']['pagination'] ?? [];
+            unset($pagination['links']);
+            return [
+                'charges' => $charges,
+                'pagination' => $pagination
+            ];
+        } catch (ClientException|ServerException $err) {
+            throw new Exception($this->manageError(['source' => 'API List charges by agent Payfac'], $err, true), $err->getCode());
+        } catch (GuzzleException|Throwable $err) {
+            throw new Exception($this->manageError(['source' => 'API List charges by agent Payfac'], $err), $err->getCode());
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function listChargesByAgentTraditional($searchData = []): array
+    {
+        $limit = $searchData['limit'] ?? 25;
+        $page = $searchData['page'] ?? 1;
+        $search = $searchData['search'] ?? [];
+        $params = array_merge(['limit' => $limit, 'page' => $page], $search);
+
+        try {
+            $response = $this->client->agentRequest('GET', 'agent/charges', [
+                'query' => $params
+            ], $this->headers);
+            $data = json_decode($response->getBody(), true);
+            $charges = array_map([$this, 'addObjectId'], $data['data']);
+            $pagination = $data['meta']['pagination'] ?? [];
+            unset($pagination['links']);
+            return [
+                'charges' => $charges,
+                'pagination' => $pagination
+            ];
+        } catch (ClientException|ServerException $err) {
+            throw new Exception($this->manageError(['source' => 'API List charges by agent Traditional'], $err, true), $err->getCode());
+        } catch (GuzzleException|Throwable $err) {
+            throw new Exception($this->manageError(['source' => 'API List charges by agent Traditional'], $err), $err->getCode());
+        }
+    }
+
 
     /**
      * @throws Exception
