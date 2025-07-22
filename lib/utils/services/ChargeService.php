@@ -232,7 +232,10 @@ class ChargeService extends BaseService
         $limit = $searchData['limit'] ?? 25;
         $page = $searchData['page'] ?? 1;
         $search = $searchData['search'] ?? [];
-        $params = array_merge(['limit' => $limit, 'page' => $page], $search);
+        $from_date = $searchData['from_date'] ?? [];
+        $to_date = $searchData['to_date'] ?? [];
+
+        $params = array_merge(['limit' => $limit, 'page' => $page, 'from_date' => $from_date, 'to_date' => $to_date], $search);
 
         try {
             $response = $this->client->agentRequest('GET', 'agent/charges', [
@@ -292,19 +295,19 @@ class ChargeService extends BaseService
      */
     public function getAchChargeParams($charge, $params = [])
     {
-            if (!is_array($charge)) {
-                $charge = $this->getCharge($charge);
-            }
-            $params['type'] = 'credit';
-            $params['amount'] = $params['amount'] ?? $charge['amount'];
-            $params['sec_code'] = $params['sec_code'] ?? $charge['sec_code'];
+        if (!is_array($charge)) {
+            $charge = $this->getCharge($charge);
+        }
+        $params['type'] = 'credit';
+        $params['amount'] = $params['amount'] ?? $charge['amount'];
+        $params['sec_code'] = $params['sec_code'] ?? $charge['sec_code'];
 
-            if (isset($charge['bank_account']['data']['object_id'])) {
-                $params['bank_account_id'] = $params['bank_account_id'] ?? $charge['bank_account']['data']['object_id'];
-            }
-            if (isset($params['bank_account_id']) && str_starts_with($params['bank_account_id'], 'bnk_')) {
-                $params['bank_account_id'] = substr($params['bank_account_id'], 4);
-            }
-            return $params;
+        if (isset($charge['bank_account']['data']['object_id'])) {
+            $params['bank_account_id'] = $params['bank_account_id'] ?? $charge['bank_account']['data']['object_id'];
+        }
+        if (isset($params['bank_account_id']) && str_starts_with($params['bank_account_id'], 'bnk_')) {
+            $params['bank_account_id'] = substr($params['bank_account_id'], 4);
+        }
+        return $params;
     }
 }
