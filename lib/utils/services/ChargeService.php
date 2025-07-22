@@ -198,17 +198,10 @@ class ChargeService extends BaseService
     /**
      * @throws Exception
      */
-    public function listChargesByAgentPayfac($searchData = []): array
+    public function listChargesByAgentPayfac(): array
     {
-        $limit = $searchData['limit'] ?? 25;
-        $page = $searchData['page'] ?? 1;
-        $search = $searchData['search'] ?? [];
-        $params = array_merge(['limit' => $limit, 'page' => $page], $search);
-
         try {
-            $response = $this->client->agentRequest('GET', 'agent-hub/merchant-bridge/charges', [
-                'query' => $params
-            ], $this->headers);
+            $response = $this->client->agentRequest('GET', 'agent-hub/merchant-bridge/charges', $this->headers);
             $data = json_decode($response->getBody(), true);
             $charges = array_map([$this, 'addObjectId'], $data['data']);
             $pagination = $data['meta']['pagination'] ?? [];
@@ -229,13 +222,11 @@ class ChargeService extends BaseService
      */
     public function listChargesByAgentTraditional($searchData = []): array
     {
-        $limit = $searchData['limit'] ?? 25;
-        $page = $searchData['page'] ?? 1;
         $search = $searchData['search'] ?? [];
         $from_date = $searchData['from_date'] ?? [];
         $to_date = $searchData['to_date'] ?? [];
 
-        $params = array_merge(['limit' => $limit, 'page' => $page, 'from_date' => $from_date, 'to_date' => $to_date], $search);
+        $params = array_merge(['from_date' => $from_date, 'to_date' => $to_date], $search);
 
         try {
             $response = $this->client->agentRequest('GET', 'agent/charges', [
