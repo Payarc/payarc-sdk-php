@@ -362,9 +362,9 @@ class ApplicationService extends BaseService
             ], $this->headers);
             return json_decode($response->getBody()->getContents(), true);
         } catch (ClientException|ServerException $err) {
-            throw new Exception($this->manageError(['source' => 'API list sub agents'], $err, true), $err->getCode());
+            throw new Exception($this->manageError(['source' => 'API lead status'], $err, true), $err->getCode());
         } catch (GuzzleException|Throwable $err) {
-            throw new Exception($this->manageError(['source' => 'API list sub agents'], $err), $err->getCode());
+            throw new Exception($this->manageError(['source' => 'API lead status'], $err), $err->getCode());
         }
     }
 
