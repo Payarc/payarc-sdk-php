@@ -81,6 +81,14 @@ class ApplicationService extends BaseService
     {
         return $this->subAgents();
     }
+
+    /**
+     * @throws Exception
+     */
+    public function lead_status($applicant)
+    {
+        return $this->status($applicant);
+    }
     /**
      * @throws Exception
      */
@@ -338,4 +346,26 @@ class ApplicationService extends BaseService
             throw new Exception($this->manageError(['source' => 'API list sub agents'], $err), $err->getCode());
         }
     }
+
+    /**
+     * @throws Exception
+     */
+    public function status($applicant){
+        try {
+            $applicantId = $applicant['object_id'] ?? $applicant;
+            if (is_string($applicantId) && str_starts_with($applicantId, 'appl_')) {
+                $applicantId = substr($applicantId, 5);
+            }
+            $this->headers['Authorization'] = 'Bearer ' . $this->client->getBearerTokenAgent();
+            $response = $this->client->request('POST', 'agent-hub/apply/lead-status', [
+                'json' => ['MerchantCode' => $applicantId]
+            ], $this->headers);
+            return json_decode($response->getBody()->getContents(), true);
+        } catch (ClientException|ServerException $err) {
+            throw new Exception($this->manageError(['source' => 'API list sub agents'], $err, true), $err->getCode());
+        } catch (GuzzleException|Throwable $err) {
+            throw new Exception($this->manageError(['source' => 'API list sub agents'], $err), $err->getCode());
+        }
+    }
+
 }
