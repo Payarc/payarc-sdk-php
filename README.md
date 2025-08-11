@@ -275,6 +275,35 @@ try {
     echo "Error detected: " . $e->getMessage() . "\n";
 }
 ```
+## Listing Charges by Agent
+
+### Example: List Charges with No Constraints by Agent (Payfac)
+
+This example demonstrates how to list all charges by agent without any constraints:
+    
+```php
+try {
+    $charges = $payarc->charges->listByAgentPayfac();
+    echo "Charges listed: " . json_encode($charges) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+### Example: List Charges with Constraints by Agent (Traditional)
+
+This example demonstrates how to list all charges by agent with date constraints:
+    
+```php
+try {
+    $charges = $payarc->charges->listByAgentTraditionallistByAgentTraditional([
+        'from_date' => '2025-07-19',
+        'to_date' => '2025-07-22'
+    ]);
+    echo "Charges listed: " . json_encode($charges) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
 ## Retrieving a Charge
 
 ### Example: Retrieve a Charge
@@ -689,6 +718,17 @@ try{
     $id = 'app_1J*****3';
     $applicant = $payarc->applications->submit($id);
     echo "Applicant submitted for signature: " . json_encode($applicant) . "\n";
+}catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+### Lead Status
+Returns the status of an application
+```php
+try{
+    $id = 'app_1J*****3';
+    $status = $payarc->applications->lead_status($id);
+    echo "Applicant status: " . json_encode($status) . "\n";
 }catch (Throwable $e) {
     echo "Error detected: " . $e->getMessage() . "\n";
 }
