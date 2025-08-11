@@ -101,4 +101,19 @@ class PayarcClient
         ]);
     }
 
+    /**
+     * @throws GuzzleException
+     */
+    public function agentRequest($method, $path, $params)
+    {
+        return $this->client->request($method, $this->base_url . $path,[
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->getBearerTokenAgent(),
+                'Content-Type' => 'application/json',
+                'User-Agent' => 'sdk-php/' . $this->getVersion()
+            ],
+            ...$params
+        ]);
+    }
+
 }

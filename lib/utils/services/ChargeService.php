@@ -37,6 +37,22 @@ class ChargeService extends BaseService
     /**
      * @throws Exception
      */
+    public function listByAgentPayfac($options = []): array
+    {
+        return $this->listChargesByAgentPayfac($options);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function listByAgentTraditional($options = []): array
+    {
+        return $this->listChargesByAgentTraditional($options);
+    }
+
+    /**
+     * @throws Exception
+     */
     public function createRefund($charge, $params)
     {
         return $this->refundCharge($charge, $params);
@@ -182,6 +198,59 @@ class ChargeService extends BaseService
     /**
      * @throws Exception
      */
+    public function listChargesByAgentPayfac(): array
+    {
+        try {
+            $response = $this->client->agentRequest('GET', 'agent-hub/merchant-bridge/charges', $this->headers);
+            $data = json_decode($response->getBody(), true);
+            $charges = array_map([$this, 'addObjectId'], $data['data']);
+            $pagination = $data['meta']['pagination'] ?? [];
+            unset($pagination['links']);
+            return [
+                'charges' => $charges,
+                'pagination' => $pagination
+            ];
+        } catch (ClientException|ServerException $err) {
+            throw new Exception($this->manageError(['source' => 'API List charges by agent Payfac'], $err, true), $err->getCode());
+        } catch (GuzzleException|Throwable $err) {
+            throw new Exception($this->manageError(['source' => 'API List charges by agent Payfac'], $err), $err->getCode());
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function listChargesByAgentTraditional($searchData = []): array
+    {
+        $search = $searchData['search'] ?? [];
+        $from_date = $searchData['from_date'] ?? [];
+        $to_date = $searchData['to_date'] ?? [];
+
+        $params = array_merge(['from_date' => $from_date, 'to_date' => $to_date], $search);
+
+        try {
+            $response = $this->client->agentRequest('GET', 'agent/charges', [
+                'query' => $params
+            ], $this->headers);
+            $data = json_decode($response->getBody(), true);
+            $charges = array_map([$this, 'addObjectId'], $data['data']);
+            $pagination = $data['meta']['pagination'] ?? [];
+            unset($pagination['links']);
+            return [
+                'charges' => $charges,
+                'pagination' => $pagination
+            ];
+        } catch (ClientException|ServerException $err) {
+            throw new Exception($this->manageError(['source' => 'API List charges by agent Traditional'], $err, true), $err->getCode());
+        } catch (GuzzleException|Throwable $err) {
+            throw new Exception($this->manageError(['source' => 'API List charges by agent Traditional'], $err), $err->getCode());
+        }
+    }
+
+
+    /**
+     * @throws Exception
+     */
     public function refundCharge($charge, $params = [])
     {
         $achRegular = false;
@@ -217,19 +286,19 @@ class ChargeService extends BaseService
      */
     public function getAchChargeParams($charge, $params = [])
     {
-            if (!is_array($charge)) {
-                $charge = $this->getCharge($charge);
-            }
-            $params['type'] = 'credit';
-            $params['amount'] = $params['amount'] ?? $charge['amount'];
-            $params['sec_code'] = $params['sec_code'] ?? $charge['sec_code'];
+        if (!is_array($charge)) {
+            $charge = $this->getCharge($charge);
+        }
+        $params['type'] = 'credit';
+        $params['amount'] = $params['amount'] ?? $charge['amount'];
+        $params['sec_code'] = $params['sec_code'] ?? $charge['sec_code'];
 
-            if (isset($charge['bank_account']['data']['object_id'])) {
-                $params['bank_account_id'] = $params['bank_account_id'] ?? $charge['bank_account']['data']['object_id'];
-            }
-            if (isset($params['bank_account_id']) && str_starts_with($params['bank_account_id'], 'bnk_')) {
-                $params['bank_account_id'] = substr($params['bank_account_id'], 4);
-            }
-            return $params;
+        if (isset($charge['bank_account']['data']['object_id'])) {
+            $params['bank_account_id'] = $params['bank_account_id'] ?? $charge['bank_account']['data']['object_id'];
+        }
+        if (isset($params['bank_account_id']) && str_starts_with($params['bank_account_id'], 'bnk_')) {
+            $params['bank_account_id'] = substr($params['bank_account_id'], 4);
+        }
+        return $params;
     }
 }
