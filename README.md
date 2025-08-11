@@ -351,6 +351,46 @@ try {
 }
 ```
 
+### Example: List Batch Reports by Agent with Constraints
+
+This example demonstrates how to 
+retrieve batch settlement reports for merchants based on a specified date range. The 
+response contains detailed transaction and settlement information for each merchant
+account within the given date range.
+
+```php
+try {
+    $batchReports = $payarc->charges->listBatchReportsByAgent([
+        'from_date' => 'YYYY-MM-DD',
+        'to_date' => 'YYYY-MM-DD'
+    ]);
+    echo "Batch Reports: " . json_encode($batchReports) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+
+### Example: List Batch Report Details by Agent
+
+This example demonstrates how to retrieve
+detailed transaction information for a specific merchant’s batch report based on the
+Merchant_Account_Number, Batch_Reference_Number, and the specified date. 
+It provides a list of individual transactions for that batch, along with batch totals.
+[Get parameters for desired batch report here](#example-list-batch-reports-by-agent-with-constraints)
+
+```php
+try {
+    $batchReportDetails = $payarc->charges->listBatchReportDetailsByAgent([
+        'merchant_account_number' => '000000000000000',
+        'reference_number' => '000000000000',
+        'date' => 'YYYY-MM-DD'
+    ]);
+    echo "Batch Details: " . json_encode($batchReportDetails) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+
 ## Managing Customers
 
 ### Example: Create a Customer with Credit Card Information

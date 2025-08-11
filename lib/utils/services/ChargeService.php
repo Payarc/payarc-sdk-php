@@ -58,7 +58,6 @@ class ChargeService extends BaseService
         return $this->refundCharge($charge, $params);
     }
 
-
     /**
      * @throws Exception
      */
@@ -286,19 +285,64 @@ class ChargeService extends BaseService
      */
     public function getAchChargeParams($charge, $params = [])
     {
-        if (!is_array($charge)) {
-            $charge = $this->getCharge($charge);
-        }
-        $params['type'] = 'credit';
-        $params['amount'] = $params['amount'] ?? $charge['amount'];
-        $params['sec_code'] = $params['sec_code'] ?? $charge['sec_code'];
+            if (!is_array($charge)) {
+                $charge = $this->getCharge($charge);
+            }
+            $params['type'] = 'credit';
+            $params['amount'] = $params['amount'] ?? $charge['amount'];
+            $params['sec_code'] = $params['sec_code'] ?? $charge['sec_code'];
 
-        if (isset($charge['bank_account']['data']['object_id'])) {
-            $params['bank_account_id'] = $params['bank_account_id'] ?? $charge['bank_account']['data']['object_id'];
-        }
-        if (isset($params['bank_account_id']) && str_starts_with($params['bank_account_id'], 'bnk_')) {
-            $params['bank_account_id'] = substr($params['bank_account_id'], 4);
-        }
-        return $params;
+            if (isset($charge['bank_account']['data']['object_id'])) {
+                $params['bank_account_id'] = $params['bank_account_id'] ?? $charge['bank_account']['data']['object_id'];
+            }
+            if (isset($params['bank_account_id']) && str_starts_with($params['bank_account_id'], 'bnk_')) {
+                $params['bank_account_id'] = substr($params['bank_account_id'], 4);
+            }
+            return $params;
     }
+
+    /**
+     * @throws Exception
+     */
+    public function listBatchReportsByAgent($searchData = []): array
+    {
+        $from_date = $searchData['from_date'] ?? [];
+        $to_date = $searchData['to_date'] ?? [];
+
+        $params = array_merge(['from_date' => $from_date, 'to_date' => $to_date]);
+
+        try {
+            $response = $this->client->agentRequest('GET', 'agent/batch/reports', [
+                'query' => $params
+            ], $this->headers);
+            return json_decode($response->getBody(), true)['data'];
+        } catch (ClientException|ServerException $err) {
+            throw new Exception($this->manageError(['source' => 'API List batch reports by agent'], $err, true), $err->getCode());
+        } catch (GuzzleException|Throwable $err) {
+            throw new Exception($this->manageError(['source' => 'API List batch reports by agent'], $err), $err->getCode());
+        }
+    }
+    /**
+     * @throws Exception
+     */
+    public function listBatchReportDetailsByAgent($searchData = []): array
+    {
+        $merchant_account_number = $searchData['merchant_account_number'] ?? [];
+        $reference_number = $searchData['reference_number'] ?? [];
+        $date = $searchData['date'] ?? [];
+
+        $params = array_merge(['$reference_number' => $reference_number, 'date' => $date]);
+
+        try {
+            $response = $this->client->agentRequest('GET', "agent/batch/reports/details/{$merchant_account_number}", [
+                'query' => $params
+            ], $this->headers);
+            return json_decode($response->getBody(), true)['data'];
+        } catch (ClientException|ServerException $err) {
+            throw new Exception($this->manageError(['source' => 'API List batch report details by agent'], $err, true), $err->getCode());
+        } catch (GuzzleException|Throwable $err) {
+            throw new Exception($this->manageError(['source' => 'API List batch report details by agent'], $err), $err->getCode());
+        }
+    }
+
 }
