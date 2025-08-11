@@ -682,6 +682,17 @@ try{
     echo "Error detected: " . $e->getMessage() . "\n";
 }
 ```
+### Lead Status
+Returns the status of an application
+```php
+try{
+    $id = 'app_1J*****3';
+    $status = $payarc->applications->lead_status($id);
+    echo "Applicant status: " . json_encode($status) . "\n";
+}catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
 ## Split Payment
 
 As ISV you can create campaigns to manage financial details around your processing merchants. In the SDK the object representing this functionality is `split_campaigns` this object has functions to create. list, update campaigns. Here below are examples related to manipulation of campaign.
