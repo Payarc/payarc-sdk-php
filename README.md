@@ -147,6 +147,9 @@ This Service is aggregating other services responsible for recurrent payments. N
     create_subscription: issue a subscription for a customer from a plan.
 Based on plans you can create subscription. Time scheduled job will request and collect payments (charges) according plan schedule from customer.
 
+### Service `Payarc->batches`
+This service is used by Agents and ISVs to retrieve information on batches.
+
 ## Creating a Charge
 ### Example: Create a Charge with Minimum Information
 To create a `payment(charge)` from a customer, minimum information required is:

@@ -9,6 +9,7 @@ class CoreServiceFactory extends BaseServiceFactory
      */
     private $classMap = [
         'charges' => ChargeService::class,
+        'batches' => BatchService::class,
         'customers' => CustomerService::class,
         'applications' => ApplicationService::class,
         'split_campaigns' => SplitCampaignService::class,
