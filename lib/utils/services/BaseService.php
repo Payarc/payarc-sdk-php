@@ -151,6 +151,10 @@ abstract class BaseService
                 $obj['update'] = function ($newData) use ($obj) {return $this->updatePlan($obj, $newData);};
                 $obj['delete'] = function () use ($obj) {return $this->deletePlan($obj);};
                 $obj['create_subscription'] = function ($newData) use ($obj) {return $this->createSubscription($obj, $newData);};
+            } elseif (isset($obj['Batch_Reference_Number'])) {
+                $obj['object_id'] = "brn_" . $obj['Batch_Reference_Number'];
+                $obj['object'] = 'Batch';
+                unset($obj['Batch_Reference_Number']);
             }
 
             foreach ($obj as $key => &$value) {

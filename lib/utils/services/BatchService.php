@@ -8,7 +8,24 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\ServerException;
 use Throwable;
 
-class BatchService extends BaseService {
+class BatchService extends BaseService
+{
+
+    /**
+     * @throws Exception
+     */
+    public function listReportsByAgent($searchData = []): array
+    {
+        return $this->listBatchReportsByAgent($searchData);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function listReportDetailsByAgent($searchData = []): array
+    {
+        return $this->listBatchReportDetailsByAgent($searchData);
+    }
 
     /**
      * @throws Exception
@@ -24,10 +41,11 @@ class BatchService extends BaseService {
             $response = $this->client->agentRequest('GET', 'agent/batch/reports', [
                 'query' => $params
             ], $this->headers);
-            return json_decode($response->getBody(), true)['data'];
-        } catch (ClientException|ServerException $err) {
+            $data = json_decode($response->getBody(), true);
+            return $this->addObjectId($data['data']);
+        } catch (ClientException | ServerException $err) {
             throw new Exception($this->manageError(['source' => 'API List batch reports by agent'], $err, true), $err->getCode());
-        } catch (GuzzleException|Throwable $err) {
+        } catch (GuzzleException | Throwable $err) {
             throw new Exception($this->manageError(['source' => 'API List batch reports by agent'], $err), $err->getCode());
         }
     }
@@ -46,10 +64,11 @@ class BatchService extends BaseService {
             $response = $this->client->agentRequest('GET', "agent/batch/reports/details/{$merchant_account_number}", [
                 'query' => $params
             ], $this->headers);
-            return json_decode($response->getBody(), true)['data'];
-        } catch (ClientException|ServerException $err) {
+            $data = json_decode($response->getBody(), true);
+            return $this->addObjectId($data['data']);
+        } catch (ClientException | ServerException $err) {
             throw new Exception($this->manageError(['source' => 'API List batch report details by agent'], $err, true), $err->getCode());
-        } catch (GuzzleException|Throwable $err) {
+        } catch (GuzzleException | Throwable $err) {
             throw new Exception($this->manageError(['source' => 'API List batch report details by agent'], $err), $err->getCode());
         }
     }
