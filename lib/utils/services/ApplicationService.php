@@ -360,7 +360,8 @@ class ApplicationService extends BaseService
             $response = $this->client->request('POST', 'agent-hub/apply/lead-status', [
                 'json' => ['MerchantCode' => $applicantId]
             ], $this->headers);
-            return json_decode($response->getBody()->getContents(), true);
+            $data = json_decode($response->getBody()->getContents(), true);
+            return $this->addObjectId($data);
         } catch (ClientException|ServerException $err) {
             throw new Exception($this->manageError(['source' => 'API lead status'], $err, true), $err->getCode());
         } catch (GuzzleException|Throwable $err) {
