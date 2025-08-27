@@ -301,48 +301,5 @@ class ChargeService extends BaseService
             return $params;
     }
 
-    /**
-     * @throws Exception
-     */
-    public function listBatchReportsByAgent($searchData = []): array
-    {
-        $from_date = $searchData['from_date'] ?? [];
-        $to_date = $searchData['to_date'] ?? [];
-
-        $params = array_merge(['from_date' => $from_date, 'to_date' => $to_date]);
-
-        try {
-            $response = $this->client->agentRequest('GET', 'agent/batch/reports', [
-                'query' => $params
-            ], $this->headers);
-            return json_decode($response->getBody(), true)['data'];
-        } catch (ClientException|ServerException $err) {
-            throw new Exception($this->manageError(['source' => 'API List batch reports by agent'], $err, true), $err->getCode());
-        } catch (GuzzleException|Throwable $err) {
-            throw new Exception($this->manageError(['source' => 'API List batch reports by agent'], $err), $err->getCode());
-        }
-    }
-    /**
-     * @throws Exception
-     */
-    public function listBatchReportDetailsByAgent($searchData = []): array
-    {
-        $merchant_account_number = $searchData['merchant_account_number'] ?? [];
-        $reference_number = $searchData['reference_number'] ?? [];
-        $date = $searchData['date'] ?? [];
-
-        $params = array_merge(['$reference_number' => $reference_number, 'date' => $date]);
-
-        try {
-            $response = $this->client->agentRequest('GET', "agent/batch/reports/details/{$merchant_account_number}", [
-                'query' => $params
-            ], $this->headers);
-            return json_decode($response->getBody(), true)['data'];
-        } catch (ClientException|ServerException $err) {
-            throw new Exception($this->manageError(['source' => 'API List batch report details by agent'], $err, true), $err->getCode());
-        } catch (GuzzleException|Throwable $err) {
-            throw new Exception($this->manageError(['source' => 'API List batch report details by agent'], $err), $err->getCode());
-        }
-    }
 
 }

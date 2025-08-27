@@ -147,6 +147,9 @@ This Service is aggregating other services responsible for recurrent payments. N
     create_subscription: issue a subscription for a customer from a plan.
 Based on plans you can create subscription. Time scheduled job will request and collect payments (charges) according plan schedule from customer.
 
+### Service `Payarc->batches`
+This service is used by Agents and ISVs to retrieve information on batches.
+
 ## Creating a Charge
 ### Example: Create a Charge with Minimum Information
 To create a `payment(charge)` from a customer, minimum information required is:
@@ -360,7 +363,7 @@ account within the given date range.
 
 ```php
 try {
-    $batchReports = $payarc->charges->listBatchReportsByAgent([
+    $batchReports = $payarc->batches->listReportsByAgent([
         'from_date' => 'YYYY-MM-DD',
         'to_date' => 'YYYY-MM-DD'
     ]);
@@ -380,7 +383,7 @@ It provides a list of individual transactions for that batch, along with batch t
 
 ```php
 try {
-    $batchReportDetails = $payarc->charges->listBatchReportDetailsByAgent([
+    $batchReportDetails = $payarc->batches->listReportDetailsByAgent([
         'merchant_account_number' => '000000000000000',
         'reference_number' => '000000000000',
         'date' => 'YYYY-MM-DD'
