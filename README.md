@@ -103,6 +103,7 @@ SDK is build around object payarc. From this object you can access properties an
 ### Object `Payarc` has the following services:
     charges - to manipulate payments
     customers - to manipulate customers
+    deposits - to manipulate deposits
     applications - to manipulate candidate merchants
     split_campaigns - to manipulate split campaigns
     billing
@@ -133,6 +134,10 @@ SDK is build around object payarc. From this object you can access properties an
     delete_document - this function removes document, when document is no longer valid.
     list_sub_agents - this function is usefull to create candidate in behalf of other agent.
     submit - this function initialize the process of sing off contract between Payarc and your client
+
+### Service `Payarc->deposits`
+#### Service `Payarc->deposits` is used to manipulate deposits in the system. This Service has the following functions:
+    listSummaryByAgent - this function returns a list of deposit summaries for a specific merchant based on the specified date range.
 
 ### Service `Payarc->billing`
 This Service is aggregating other services responsible for recurrent payments. Nowadays, they are `plan` and `plan_subscription`.
@@ -389,22 +394,6 @@ try {
         'date' => 'YYYY-MM-DD'
     ]);
     echo "Batch Details: " . json_encode($batchReportDetails) . "\n";
-} catch (Throwable $e) {
-    echo "Error detected: " . $e->getMessage() . "\n";
-}
-```
-
-#### Example: List Deposits by Agent with Constraints
-
-This example demonstrates how to retrieve deposit summaries for a specific merchant based on the specified date range.
-```php
-try {
-    $summary = $payarc->charges->listDepositSummaryByAgent([
-        'from_date' => '0000-00-00',
-        'to_date' => '0000-00-00',
-    ]);
-
-    echo "Deposits: " . json_encode($summary) . "\n";
 } catch (Throwable $e) {
     echo "Error detected: " . $e->getMessage() . "\n";
 }
@@ -987,6 +976,24 @@ try {
         'text' => 'test doc evidence 3'
     ]);
     echo "Document added: " . json_encode($case) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+
+## List Deposits
+
+#### Example: List Deposits by Agent with Constraints
+
+This example demonstrates how to retrieve deposit summaries for a specific merchant based on the specified date range.
+```php
+try {
+    $summary = $payarc->deposits->listSummaryByAgent([
+        'from_date' => '0000-00-00',
+        'to_date' => '0000-00-00',
+    ]);
+
+    echo "Deposits: " . json_encode($summary) . "\n";
 } catch (Throwable $e) {
     echo "Error detected: " . $e->getMessage() . "\n";
 }
