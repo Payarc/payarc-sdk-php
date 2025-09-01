@@ -302,4 +302,29 @@ class ChargeService extends BaseService
     }
 
 
+    /**
+     * @throws Exception
+     */
+    public function listDepositSummaryByAgent(mixed $options): array
+    {
+        $params = [
+            'from_date' => $options['from_date'] ?? [],
+            'to_date' => $options['to_date'] ?? [],
+        ];
+
+        try {
+            $response = $this->client->request('GET', 'agent/deposit/summary', [
+                'query' => $params
+            ], $this->headers);
+            $data = json_decode($response->getBody(), true);
+
+            return $this->addObjectId($data['data']);
+
+        } catch (ClientException|ServerException $err) {
+            throw new Exception($this->manageError(['source' => 'API List Agent deposits'], $err, true), $err->getCode());
+        } catch (GuzzleException|Throwable $err) {
+            throw new Exception($this->manageError(['source' => 'API List Agent deposits'], $err), $err->getCode());
+        }
+    }
+
 }

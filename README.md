@@ -394,6 +394,22 @@ try {
 }
 ```
 
+#### Example: List Deposits by Agent with Constraints
+
+This example demonstrates how to retrieve deposit summaries for a specific merchant based on the specified date range.
+```php
+try {
+    $summary = $payarc->charges->listDepositSummaryByAgent([
+        'from_date' => '0000-00-00',
+        'to_date' => '0000-00-00',
+    ]);
+
+    echo "Deposits: " . json_encode($summary) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+
 ## Managing Customers
 
 ### Example: Create a Customer with Credit Card Information
