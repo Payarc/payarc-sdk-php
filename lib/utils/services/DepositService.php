@@ -16,8 +16,8 @@ class DepositService extends BaseService
     public function listSummaryByAgent(mixed $options): array
     {
         $params = [
-            'from_date' => $options['from_date'] ?? [],
-            'to_date' => $options['to_date'] ?? [],
+            'from_date' => $options['from_date'] ?? '',
+            'to_date' => $options['to_date'] ?? '',
         ];
 
         try {
