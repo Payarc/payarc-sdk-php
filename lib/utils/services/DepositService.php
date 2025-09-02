@@ -13,25 +13,21 @@ class DepositService extends BaseService
     /**
      * @throws Exception
      */
-    public function listSummaryByAgent(mixed $options): array
+    public function agentDepositSummary(mixed $options)
     {
-        $params = [
-            'from_date' => $options['from_date'] ?? '',
-            'to_date' => $options['to_date'] ?? '',
-        ];
-
         try {
             $response = $this->client->request('GET', 'agent/deposit/summary', [
-                'query' => $params
+                'query' => $options
             ], $this->headers);
-            $data = json_decode($response->getBody(), true);
-
-            return $this->addObjectId($data['data']);
+            $data = json_decode($response->getBody()->getContents(), true);
+            return [
+                'deposits' => $this->addObjectId($data['data']),
+            ];
 
         } catch (ClientException|ServerException $err) {
-            throw new Exception($this->manageError(['source' => 'API List Agent deposits'], $err, true), $err->getCode());
+            throw new Exception($this->manageError(['source' => 'API List Agent deposits summary'], $err, true), $err->getCode());
         } catch (GuzzleException|Throwable $err) {
-            throw new Exception($this->manageError(['source' => 'API List Agent deposits'], $err), $err->getCode());
+            throw new Exception($this->manageError(['source' => 'API List Agent deposits summary'], $err), $err->getCode());
         }
     }
 
