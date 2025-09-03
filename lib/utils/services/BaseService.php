@@ -131,6 +131,10 @@ abstract class BaseService
                         $obj['object'] = 'Dispute';
                         $obj['object_id'] = "dis_" . $obj['id'];
                         break;
+                    case 'Account':
+                        $obj['object'] = 'Merchant';
+                        $obj['object_id'] = "acc_" . $obj['id'];
+                        break;
                 }
             }
            elseif (isset($obj['MerchantCode'])) {

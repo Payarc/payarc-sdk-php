@@ -11,6 +11,7 @@ class CoreServiceFactory extends BaseServiceFactory
         'charges' => ChargeService::class,
         'batches' => BatchService::class,
         'customers' => CustomerService::class,
+        'deposits' => DepositService::class,
         'applications' => ApplicationService::class,
         'split_campaigns' => SplitCampaignService::class,
         'billing' =>[

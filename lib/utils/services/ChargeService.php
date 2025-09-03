@@ -300,6 +300,4 @@ class ChargeService extends BaseService
             }
             return $params;
     }
-
-
 }
