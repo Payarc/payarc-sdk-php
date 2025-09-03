@@ -137,7 +137,7 @@ SDK is build around object payarc. From this object you can access properties an
 
 ### Service `Payarc->deposits`
 #### Service `Payarc->deposits` is used to manipulate deposits in the system. This Service has the following functions:
-    agentDepositSummary - this function returns a list of deposit summaries for agent based on the specified date range. Mids and account_ids are optional parameters.
+    list - this function returns a list of deposit summaries for agent based on the specified date range. Mids and account_ids are optional parameters.
 
 ### Service `Payarc->billing`
 This Service is aggregating other services responsible for recurrent payments. Nowadays, they are `plan` and `plan_subscription`.
@@ -988,11 +988,11 @@ try {
 This example demonstrates how to retrieve deposit summaries for agent based on the specified date range and optional constraints on mids and account_ids.
 ```php
 try {
-    $summary = $payarc->deposits->agentDepositSummary([
-        'mids' => ['0000000000000000', '0000000000000000'],
+    $summary = $payarc->deposits->list([
+        'mids' => ['09267********', '056700********'],
         'account_ids' => ['0000000000000000', '0000000000000000'],
-        'from_date' => '0000-00-00',
-        'to_date' => '0000-00-00',
+        'from_date' => '2025-01-01',
+        'to_date' => '2025-01-31',
     ]);
 
     echo "Agent deposits summary: " . json_encode($summary) . "\n";
