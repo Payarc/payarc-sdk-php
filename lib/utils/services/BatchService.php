@@ -14,7 +14,7 @@ class BatchService extends BaseService
     /**
      * @throws Exception
      */
-    public function listReportsByAgent($searchData = []): array
+    public function list($searchData = []): array
     {
         return $this->listBatchReportsByAgent($searchData);
     }
@@ -22,7 +22,7 @@ class BatchService extends BaseService
     /**
      * @throws Exception
      */
-    public function listReportDetailsByAgent($searchData = []): array
+    public function retrieve($searchData = []): array
     {
         return $this->listBatchReportDetailsByAgent($searchData);
     }
