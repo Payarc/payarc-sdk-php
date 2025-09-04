@@ -363,7 +363,7 @@ account within the given date range.
 
 ```php
 try {
-    $batchReports = $payarc->batches->listReportsByAgent([
+    $batchReports = $payarc->batches->list([
         'from_date' => 'YYYY-MM-DD',
         'to_date' => 'YYYY-MM-DD'
     ]);
@@ -383,7 +383,7 @@ It provides a list of individual transactions for that batch, along with batch t
 
 ```php
 try {
-    $batchReportDetails = $payarc->batches->listReportDetailsByAgent([
+    $batchReportDetails = $payarc->batches->retrieve([
         'merchant_account_number' => '000000000000000',
         'reference_number' => '000000000000',
         'date' => 'YYYY-MM-DD'
