@@ -9,8 +9,8 @@ class CoreServiceFactory extends BaseServiceFactory
      */
     private $classMap = [
         'charges' => ChargeService::class,
-        'batches' => BatchService::class,
         'customers' => CustomerService::class,
+        'batches' => BatchService::class,
         'deposits' => DepositService::class,
         'applications' => ApplicationService::class,
         'split_campaigns' => SplitCampaignService::class,
@@ -19,8 +19,8 @@ class CoreServiceFactory extends BaseServiceFactory
             'plan_subscription' => SubscriptionService::class,
         ],
         'disputes' => DisputeService::class,
+        'userSettings' => UserSettingsService::class,
         'payarcConnect' => PayarcConnectService::class,
-        'userSettings' => UserSettingsService::class
     ];
 
     public function __construct($client)

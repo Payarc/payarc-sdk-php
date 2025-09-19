@@ -102,6 +102,7 @@ SDK is build around object payarc. From this object you can access properties an
 
 ### Object `Payarc` has the following services:
     charges - to manipulate payments
+    batches - to manipulate batches
     customers - to manipulate customers
     deposits - to manipulate deposits
     applications - to manipulate candidate merchants
@@ -109,12 +110,21 @@ SDK is build around object payarc. From this object you can access properties an
     billing
        - plan - to manipulate plans
        - plan_subscription - to manipulate Plan subscriptions
+    disputes - to manipulate disputes
+    userSettings - to manipulate user settings
+    payarcConnect - to interact with a terminal running Payarc Connect
 
+### Service ``Payarc->charges``
 #### Service `Payarc->charges` is used to manipulate payments in the system. This Service has the following functions:
     create - this function will create a payment intent or charge accepting various configurations and parameters. See examples for some use cases. 
     retrieve - this function returns json object 'Charge' with details
     list - returns an object with attribute 'charges' a list of json object holding information for charges and object in attribute 'pagination'
     createRefund - function to perform a refund over existing charge
+
+### Service ``Payarc->batches``
+#### Service `Payarc->batches` is used to manipulate payments in the system. This Service has the following functions:
+    retrieve - this function returns json object 'Batch' with details
+    list - returns an object with attribute 'batches' a list of json object holding information for batches and object in attribute 'pagination'
 
 ### Service ``Payarc->customer``
 #### Service `Payarc->customer` is representing your customers with personal details, addresses and credit cards and/or bank accounts. Saved for future needs
@@ -152,8 +162,13 @@ This Service is aggregating other services responsible for recurrent payments. N
     create_subscription: issue a subscription for a customer from a plan.
 Based on plans you can create subscription. Time scheduled job will request and collect payments (charges) according plan schedule from customer.
 
-### Service `Payarc->batches`
-This service is used by Agents and ISVs to retrieve information on batches.
+### Service `Payarc->userSettings`
+#### This Service is used to manipulate user settings in the system. This SERVICE has methods for:
+    retrieveMerchant - collect user settings for a merchant user,
+    retrieveAgent - collect user settings for an agent user,
+    setMerchant - set specified setting for merchant user,
+    setAgent - set specified setting for agent user,
+Based on plans you can create subscription. Time scheduled job will request and collect payments (charges) according plan schedule from customer.
 
 ## Creating a Charge
 ### Example: Create a Charge with Minimum Information
@@ -996,6 +1011,69 @@ try {
     ]);
 
     echo "Agent deposits summary: " . json_encode($summary) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+
+## Retrieving Settings
+### Example: Retrieve Merchant Settings
+This example demonstrates how to retrieve user settings for a merchant
+```php
+try {
+    $merchantSettings = $payarc->userSettings->retrieveMerchant();
+    echo "Merchant Settings: " . json_encode($merchantSettings, JSON_PRETTY_PRINT) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+### Example: Retrieve Agent Settings
+This example demonstrates how to retrieve user settings for an agent
+```php
+try {
+    $agentSettings = $payarc->userSettings->retrieveAgent();
+    echo "Agent Settings: " . json_encode($agentSettings, JSON_PRETTY_PRINT) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+## Create or Update Settings
+There are currently 4 user settings that can be manipulated
+| Enum Value                                          | Description                          |
+|-----------------------------------------------------|--------------------------------------|
+| `UserSettingKey::ONBOARDING_WEBHOOK`                | Onboarding Webhook URL               |
+| `UserSettingKey::LEAD_UPDATE_WEBHOOK`               | Lead Update Webhook URL              |
+| `UserSettingKey::LEAD_UPDATE_CATEGORY_WEBHOOK`      | Lead Category Update Webhook URL     |
+| `UserSettingKey::LEAD_UNDERWRITING_UPDATED_WEBHOOK` | Lead Underwriting Update Webhook URL |
+
+
+### Example: Create or Update Merchant Settings
+This example demonstrates how to create or update the Lead Underwriting Update Webhook URL for a merchant user
+```php
+try {
+    use Payarc\PayarcSdkPhp\Enums\UserSettingKey;
+
+    $merchantCreated = $payarc->userSettings->setMerchant([
+        "key" => UserSettingKey::LEAD_UNDERWRITING_UPDATED_WEBHOOK, 
+        "value" => "www.example.com"
+    ]);
+    echo "Merchant Setting set: " . json_encode($merchantCreated, JSON_PRETTY_PRINT) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+
+```
+### Example: Create or Update Agent Settings
+This example demonstrates how to create or update the Lead Underwriting Update Webhook URL for an agent user
+```php
+try {
+    use Payarc\PayarcSdkPhp\Enums\UserSettingKey;
+
+    $agentCreated = $payarc->userSettings->setAgent([
+        "key" => UserSettingKey::ONBOARDING_WEBHOOK, 
+        "value" => "www.example.com"
+    ]);
+    echo "Agent Setting set: " . json_encode($agentCreated, JSON_PRETTY_PRINT) . "\n";
 } catch (Throwable $e) {
     echo "Error detected: " . $e->getMessage() . "\n";
 }
