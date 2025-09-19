@@ -135,6 +135,8 @@ abstract class BaseService
                         $obj['object'] = 'Merchant';
                         $obj['object_id'] = "acc_" . $obj['id'];
                         break;
+                    case 'UserSetting':
+                        $obj['object_id'] = "us_" .$obj['id'];
                 }
             }
            elseif (isset($obj['MerchantCode'])) {

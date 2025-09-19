@@ -20,6 +20,7 @@ class CoreServiceFactory extends BaseServiceFactory
         ],
         'disputes' => DisputeService::class,
         'payarcConnect' => PayarcConnectService::class,
+        'userSettings' => UserSettingsService::class
     ];
 
     public function __construct($client)
