@@ -111,7 +111,7 @@ SDK is build around object payarc. From this object you can access properties an
        - plan - to manipulate plans
        - plan_subscription - to manipulate Plan subscriptions
     disputes - to manipulate disputes
-    userSettings - to manipulate user settings
+    user_settings - to manipulate user settings
     payarcConnect - to interact with a terminal running Payarc Connect
 
 ### Service ``Payarc->charges``
@@ -162,13 +162,12 @@ This Service is aggregating other services responsible for recurrent payments. N
     create_subscription: issue a subscription for a customer from a plan.
 Based on plans you can create subscription. Time scheduled job will request and collect payments (charges) according plan schedule from customer.
 
-### Service `Payarc->userSettings`
+### Service `Payarc->user_settings->agent->webhooks`
 #### This Service is used to manipulate user settings in the system. This SERVICE has methods for:
-    retrieveMerchant - collect user settings for a merchant user,
-    retrieveAgent - collect user settings for an agent user,
-    setMerchant - set specified setting for merchant user,
-    setAgent - set specified setting for agent user,
-Based on plans you can create subscription. Time scheduled job will request and collect payments (charges) according plan schedule from customer.
+    create - this function will create object stored in the database for webhooks in form of key value pair,
+    list - this function allows you to search amongst user settings you had created,
+    update - this function allows you to modify attributes of user settings object,
+    delete - this function allows you to delete user settings object.
 
 ## Creating a Charge
 ### Example: Create a Charge with Minimum Information
@@ -1015,30 +1014,9 @@ try {
     echo "Error detected: " . $e->getMessage() . "\n";
 }
 ```
-
-## Retrieving Settings
-### Example: Retrieve Merchant Settings
-This example demonstrates how to retrieve user settings for a merchant
-```php
-try {
-    $merchantSettings = $payarc->userSettings->retrieveMerchant();
-    echo "Merchant Settings: " . json_encode($merchantSettings, JSON_PRETTY_PRINT) . "\n";
-} catch (Throwable $e) {
-    echo "Error detected: " . $e->getMessage() . "\n";
-}
-```
-### Example: Retrieve Agent Settings
-This example demonstrates how to retrieve user settings for an agent
-```php
-try {
-    $agentSettings = $payarc->userSettings->retrieveAgent();
-    echo "Agent Settings: " . json_encode($agentSettings, JSON_PRETTY_PRINT) . "\n";
-} catch (Throwable $e) {
-    echo "Error detected: " . $e->getMessage() . "\n";
-}
-```
-## Create or Update Settings
-There are currently 4 user settings that can be manipulated:
+## Managing Webhooks on Agent Level
+#### Webhooks management is available for agents only. To use this functionality you need to provide agent token on the constructor of the SDK.
+#### There are 4 type of webhooks that could be created:
 
 | Enum Value                                      | Description                       |
 |-------------------------------------------------|-----------------------------------|
@@ -1047,69 +1025,57 @@ There are currently 4 user settings that can be manipulated:
 | `UserSettingKey::LEAD_UPDATE_CATEGORY_WEBHOOK`| Lead Category Update Webhook URL  |
 | `UserSettingKey::LEAD_UNDERWRITING_UPDATED_WEBHOOK` | Lead Underwriting Update Webhook URL |
 
-
-### Example: Create or Update Merchant Settings
-This example demonstrates how to create or update the Lead Underwriting Update Webhook URL for a merchant user
+### Example: Create Webhook
+This example demonstrates how to create a webhook:
 ```php
 try {
-    use Payarc\PayarcSdkPhp\Enums\UserSettingKey;
-
-    $merchantCreated = $payarc->userSettings->setMerchant([
-        "key" => UserSettingKey::LEAD_UNDERWRITING_UPDATED_WEBHOOK, 
+    $webhookCreate = $payarc->user_settings->agent->webhooks->create([
+        "key" =>  UserSettingKey::ONBOARDING_WEBHOOK,
         "value" => "www.example.com"
     ]);
-    echo "Merchant Setting set: " . json_encode($merchantCreated, JSON_PRETTY_PRINT) . "\n";
-} catch (Throwable $e) {
-    echo "Error detected: " . $e->getMessage() . "\n";
-}
-
-```
-### Example: Create or Update Agent Settings
-This example demonstrates how to create or update the Lead Underwriting Update Webhook URL for an agent user
-```php
-try {
-    use Payarc\PayarcSdkPhp\Enums\UserSettingKey;
-
-    $agentCreated = $payarc->userSettings->setAgent([
-        "key" => UserSettingKey::LEAD_UNDERWRITING_UPDATED_WEBHOOK, 
-        "value" => "www.example.com"
-    ]);
-    echo "Agent Setting set: " . json_encode($agentCreated, JSON_PRETTY_PRINT) . "\n";
+    echo "Webhook created: " . json_encode($webhookCreate, JSON_PRETTY_PRINT) . "\n";
 } catch (Throwable $e) {
     echo "Error detected: " . $e->getMessage() . "\n";
 }
 ```
-## Delete Settings
-
-### Example: Delete Merchant Setting
-
-This example shows how to delete the Lead Underwriting Update Webhook URL for a merchant user.
+### Example: List Webhooks
+This example demonstrates how to list all webhooks:
 ```php
-  try
-  {
-      $merchantDeleted = $payarc->userSettings->deleteMerchant([
-        "key" => UserSettingKey::LEAD_UNDERWRITING_UPDATED_WEBHOOK,
-    ]);
-      echo "Merchant setting deleted: " . $merchantDeleted . "\n";
-  } 
-  catch (Throwable $e) {
-      echo "Error detected: " . $e->getMessage() . "\n";
-  }
+try {
+     $webhookList = $payarc->user_settings->agent->webhooks->list();
+     echo "Webhooks: " . json_encode($webhookList, JSON_PRETTY_PRINT) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
 ```
-### Example: Delete Agent Setting
-
-This example shows how to delete the Lead Underwriting Update Webhook URL for an agent user.
+### Example: Update Webhook
+This example demonstrates how to update a webhook:
 ```php
-  try
-  {
-      $agentDeleted = $payarc->userSettings->deleteAgent([
-        "key" => UserSettingKey::LEAD_UNDERWRITING_UPDATED_WEBHOOK,
+try {
+    $webhookUpdated = $payarc->user_settings->agent->webhooks->update([
+        "key" =>  UserSettingKey::ONBOARDING_WEBHOOK,
+        "value" => "www.example.com"
     ]);
-      echo "Customer deleted: " . $agentDeleted . "\n";
-  } 
-  catch (Throwable $e) {
-      echo "Error detected: " . $e->getMessage() . "\n";
-  }
+    echo "Webhook updated: " . json_encode($webhookUpdated, JSON_PRETTY_PRINT) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+This example demonstrates how to update a webhook by object:
+```php
+todo
+```
+### Example: Delete Webhook
+This example demonstrates how to delete a webhook:
+```php
+try {
+    $webhookDeleted = $payarc->user_settings->agent->webhooks->delete([
+        "key" => UserSettingKey::ONBOARDING_WEBHOOK,
+    ]);
+    echo "Webhook deleted: " . $webhookDeleted . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
 ```
 
 # Payarc Connect
