@@ -1038,12 +1038,13 @@ try {
 }
 ```
 ## Create or Update Settings
-There are currently 4 user settings that can be manipulated
-| Enum Value                                          | Description                          |
-|-----------------------------------------------------|--------------------------------------|
-| `UserSettingKey::ONBOARDING_WEBHOOK`                | Onboarding Webhook URL               |
-| `UserSettingKey::LEAD_UPDATE_WEBHOOK`               | Lead Update Webhook URL              |
-| `UserSettingKey::LEAD_UPDATE_CATEGORY_WEBHOOK`      | Lead Category Update Webhook URL     |
+There are currently 4 user settings that can be manipulated:
+
+| Enum Value                                      | Description                       |
+|-------------------------------------------------|-----------------------------------|
+| `UserSettingKey::ONBOARDING_WEBHOOK`           | Onboarding Webhook URL            |
+| `UserSettingKey::LEAD_UPDATE_WEBHOOK`         | Lead Update Webhook URL           |
+| `UserSettingKey::LEAD_UPDATE_CATEGORY_WEBHOOK`| Lead Category Update Webhook URL  |
 | `UserSettingKey::LEAD_UNDERWRITING_UPDATED_WEBHOOK` | Lead Underwriting Update Webhook URL |
 
 
@@ -1070,13 +1071,45 @@ try {
     use Payarc\PayarcSdkPhp\Enums\UserSettingKey;
 
     $agentCreated = $payarc->userSettings->setAgent([
-        "key" => UserSettingKey::ONBOARDING_WEBHOOK, 
+        "key" => UserSettingKey::LEAD_UNDERWRITING_UPDATED_WEBHOOK, 
         "value" => "www.example.com"
     ]);
     echo "Agent Setting set: " . json_encode($agentCreated, JSON_PRETTY_PRINT) . "\n";
 } catch (Throwable $e) {
     echo "Error detected: " . $e->getMessage() . "\n";
 }
+```
+## Delete Settings
+
+### Example: Delete Merchant Setting
+
+This example shows how to delete the Lead Underwriting Update Webhook URL for a merchant user.
+```php
+  try
+  {
+      $merchantDeleted = $payarc->userSettings->deleteMerchant([
+        "key" => UserSettingKey::LEAD_UNDERWRITING_UPDATED_WEBHOOK,
+    ]);
+      echo "Merchant setting deleted: " . $merchantDeleted . "\n";
+  } 
+  catch (Throwable $e) {
+      echo "Error detected: " . $e->getMessage() . "\n";
+  }
+```
+### Example: Delete Agent Setting
+
+This example shows how to delete the Lead Underwriting Update Webhook URL for an agent user.
+```php
+  try
+  {
+      $agentDeleted = $payarc->userSettings->deleteAgent([
+        "key" => UserSettingKey::LEAD_UNDERWRITING_UPDATED_WEBHOOK,
+    ]);
+      echo "Customer deleted: " . $agentDeleted . "\n";
+  } 
+  catch (Throwable $e) {
+      echo "Error detected: " . $e->getMessage() . "\n";
+  }
 ```
 
 # Payarc Connect
