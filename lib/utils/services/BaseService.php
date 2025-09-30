@@ -65,6 +65,9 @@ abstract class BaseService
     protected function cancelSubscription($subscription) {}
     protected function updateSubscription($subscription, $newData){}
 
+    //User Settings
+    protected function setWebhook(array $userSettings, $newData) {}
+
     public function addObjectId(&$obj)
     {
         $handleObject = function (&$obj) use (&$handleObject) {
@@ -137,6 +140,7 @@ abstract class BaseService
                         break;
                     case 'UserSetting':
                         $obj['object_id'] = "usr_" .$obj['id'];
+                        $obj['update'] = function ($newData) use ($obj) {return $this->setWebhook($obj, $newData);};
                 }
             }
            elseif (isset($obj['MerchantCode'])) {

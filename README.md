@@ -1063,7 +1063,18 @@ try {
 ```
 This example demonstrates how to update a webhook by object:
 ```php
-todo
+try {
+    $webhookList = $payarc->user_settings->agent->webhooks->list();
+    $webhookToUpdate = $webhookList[0] ?? null;
+    if($webhookToUpdate != null){
+        $updatedWebhook = $webhookToUpdate['update']('www.example2.com');
+        echo "Webhook updated: " . json_encode($updatedWebhook, JSON_PRETTY_PRINT) . "\n";
+    } else {
+        echo 'Webhook not found';
+    }
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
 ```
 ### Example: Delete Webhook
 This example demonstrates how to delete a webhook:

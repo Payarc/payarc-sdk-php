@@ -14,7 +14,7 @@ class WebhookService extends BaseService
     /**
      * @throws Exception
      */
-    public function create($userSettings=[])
+    public function create($userSettings=[]): array
     {
         return $this->setWebhook($userSettings);
     }
@@ -29,7 +29,7 @@ class WebhookService extends BaseService
     /**
      * @throws Exception
      */
-    public function update($userSettings = [])
+    public function update($userSettings = []): array
     {
         return $this->setWebhook($userSettings);
     }
@@ -37,7 +37,7 @@ class WebhookService extends BaseService
     /**
      * @throws Exception
      */
-    public function delete($userSettings = [])
+    public function delete($userSettings = []): bool
     {
         return $this->deleteWebhookSetting($userSettings);
     }
@@ -61,11 +61,17 @@ class WebhookService extends BaseService
     }
 
     /**
+     * @param array $userSettings
+     * @param null $newData
+     * @return array
      * @throws Exception
      */
-    public function setWebhook($userSettings = []): array
+    public function setWebhook(array $userSettings = [], $newData = null): array
     {
         try {
+            if ($newData !== null) {
+                $userSettings['value'] = $newData;
+            }
             $this->headers['Authorization'] = 'Bearer ' . $this->client->getBearerTokenAgent();
             $response = $this->client->request('POST', 'my-user-settings', [
                 'json' => $userSettings
@@ -80,9 +86,11 @@ class WebhookService extends BaseService
     }
 
     /**
+     * @param array $userSettings
+     * @return bool
      * @throws Exception
      */
-    public function deleteWebhookSetting($userSettings = []): bool
+    public function deleteWebhookSetting(array $userSettings = []): bool
     {
         try {
             $this->headers['Authorization'] = 'Bearer ' . $this->client->getBearerTokenAgent();
