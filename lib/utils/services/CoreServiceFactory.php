@@ -19,7 +19,11 @@ class CoreServiceFactory extends BaseServiceFactory
             'plan_subscription' => SubscriptionService::class,
         ],
         'disputes' => DisputeService::class,
-        'userSettings' => UserSettingsService::class,
+        'user_settings' => [
+            'agent' => [
+                'webhooks' => WebhookService::class
+            ]
+        ],
         'payarcConnect' => PayarcConnectService::class,
     ];
 
