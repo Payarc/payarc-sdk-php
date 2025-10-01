@@ -73,6 +73,9 @@ abstract class BaseService
                     case 'Charge':
                         $obj['object_id'] = "ch_" . $obj['id'];
                         $obj['create_refund'] = function ($params) use ($obj) {return $this->refundCharge($obj, $params);};
+                        if ($obj['splits']) {
+                            $obj['adjust_splits'] = function ($params) use ($obj) {return $this->adjustSplits($obj, $params);};
+                        }
                         break;
                     case 'customer':
                         $obj['object_id'] = "cus_" . $obj['customer_id'];
@@ -100,6 +103,9 @@ abstract class BaseService
                     case 'ACHCharge':
                         $obj['object_id'] = "ach_" . $obj['id'];
                         $obj['create_refund'] = function ($params) use ($obj) {return $this->refundCharge($obj, $params);};
+                        break;
+                    case 'ChargeSplit':
+                        $obj['object_id'] = "chs_" . $obj['id'];
                         break;
                     case 'ApplyApp':
                         $obj['object_id'] = "appl_" . $obj['id'];
