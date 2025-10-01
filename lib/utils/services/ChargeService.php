@@ -63,9 +63,19 @@ class ChargeService extends BaseService
         return $this->adjustChargeTip($chargeIdWithPrefix, $tipParams);
     }
 
+    public function createSplit($splitParams)
+    {
+        return $this->createChargeSplit($splitParams);
+    }
+
     public function adjustSplits($chargeIdWithPrefix, $splitParams)
     {
         return $this->adjustChargeSplits($chargeIdWithPrefix, $splitParams);
+    }
+
+    public function listSplits($params = [])
+    {
+        return $this->listChargeSplits($params);
     }
 
     /**
@@ -359,6 +369,47 @@ class ChargeService extends BaseService
             throw new Exception($this->manageError(['source' => 'API Split adjust charge'], $err, true), $err->getCode());
         } catch (GuzzleException|Throwable $err) {
             throw new Exception($this->manageError(['source' => 'API Split adjust charge'], $err), $err->getCode());
+        }
+    }
+
+    private function listChargeSplits($params)
+    {
+        $queryParams = [
+            'limit' => $params['limit'] ?? 25,
+            'page' => $params['page'] ?? 1,
+            'search' => $params['search'] ?? [],
+        ];
+
+        try {
+            $response = $this->client->request('GET', "instructional_funding", [
+                'query' => $queryParams
+            ], $this->headers);
+            $data = json_decode($response->getBody()->getContents(), true);
+            return $this->addObjectId($data['data']);
+        } catch (ClientException|ServerException $err) {
+            throw new Exception($this->manageError(['source' => 'API List charge splits'], $err, true), $err->getCode());
+        } catch (GuzzleException|Throwable $err) {
+            throw new Exception($this->manageError(['source' => 'API List charge splits'], $err), $err->getCode());
+        }
+    }
+
+    private function createChargeSplit($splitParams)
+    {
+        $include = $splitParams['include'] ?? 'charge';
+
+        try {
+            $response = $this->client->request('POST', "instructional_funding", [
+                'json' => $splitParams,
+                'query' => [
+                    'include' => $include,
+                ],
+            ], $this->headers);
+            $data = json_decode($response->getBody()->getContents(), true);
+            return $this->addObjectId($data['data']);
+        } catch (ClientException|ServerException $err) {
+            throw new Exception($this->manageError(['source' => 'API Create charge split'], $err, true), $err->getCode());
+        } catch (GuzzleException|Throwable $err) {
+            throw new Exception($this->manageError(['source' => 'API Create charge split'], $err), $err->getCode());
         }
     }
 }
