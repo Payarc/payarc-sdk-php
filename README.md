@@ -741,6 +741,83 @@ try{
     echo "Error detected: " . $e->getMessage() . "\n";
 }
 ```
+## Manage Payee
+
+### Create new Payee
+
+In the process of connecting your payee with Payarc a selection is made based on Payarc's criteria. Process begins with filling information for the payee and creating an entry in the database. Here is an example how this process could start
+```php
+try {
+    $result = $payarc->payee->create([
+        'type' => 'sole_prop', // Allowed: sole_prop or business
+        'personal_info' => [
+            'first_name' => 'PayeeName',
+            'last_name' => 'PayeeLast',
+            'ssn' => '#########',
+            'dob' => 'YYYY-MM-DD'
+        ],
+        'business_info' => [
+            'legal_name' => 'Payee Business Name',
+            'ein' => '##-#######',
+            'irs_filing_type' => 'A' 
+            // "A" - Foreign Entity Verification Pending
+            // "B" - Foreign Entity Identified before 1/1/11
+            // "C" - Non Profit Verified
+            // "D" - Non Profit Verification Pending
+            // "F" - Foreign Entity Verified
+            // "G" - Government Entity
+            // "J" - Financial Institution
+            // "N" - Not Excluded
+        ],
+        'contact_info' => [
+            'email' => 'payee@example.com',
+            'phone_number' => '1234567890'
+        ],
+        'address_info' => [
+            'street' => '123 Test St',
+            'city' => 'Test City',
+            'zip_code' => '12345',
+            'county_code' => 'NY'
+        ],
+        'banking_info' => [
+            'dda' => '123456789',
+            'routing' => '987654321'
+        ],
+        'foundation_date' => 'YYYY-MM-DD',
+        'date_incorporated' => 'YYYY-MM-DD'
+    ]);
+
+    echo "Submitted Payee: " . json_encode($result, JSON_PRETTY_PRINT) . PHP_EOL;
+
+} catch (Exception $e) {
+    echo "An error occurred: " . $e->getMessage() . PHP_EOL;
+}
+```
+
+### Retrieve Information for Payees
+
+List all payee for current agent
+```php
+try {
+    $res = $payarc->payee->list();
+    echo "List of payees: " . json_encode($res, JSON_PRETTY_PRINT) . PHP_EOL;
+} catch (Exception $e) {
+    echo "An error occurred: " . $e->getMessage() . PHP_EOL;
+}
+```
+
+### Example: Delete a Payee
+
+This example demonstrates how to delete an existing payee when only ID is known:
+
+```php
+try {
+    $obj = $payarc->payee->delete('appy_AnonymizedPayeeID');
+    echo "Payee deleted successfully: " . json_encode($obj, JSON_PRETTY_PRINT) . PHP_EOL;
+} catch (Exception $e) {
+    echo "An error occurred: " . $e->getMessage() . PHP_EOL;
+}
+```
 ## Split Payment
 
 As ISV you can create campaigns to manage financial details around your processing merchants. In the SDK the object representing this functionality is `split_campaigns` this object has functions to create. list, update campaigns. Here below are examples related to manipulation of campaign.
