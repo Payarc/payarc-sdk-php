@@ -58,6 +58,26 @@ class ChargeService extends BaseService
         return $this->refundCharge($charge, $params);
     }
 
+    public function tipAdjust($chargeIdWithPrefix, $tipParams)
+    {
+        return $this->adjustChargeTip($chargeIdWithPrefix, $tipParams);
+    }
+
+    public function createSplit($splitParams)
+    {
+        return $this->createChargeSplit($splitParams);
+    }
+
+    public function adjustSplits($chargeIdWithPrefix, $splitParams)
+    {
+        return $this->adjustChargeSplits($chargeIdWithPrefix, $splitParams);
+    }
+
+    public function listSplits($params = [])
+    {
+        return $this->listChargeSplits($params);
+    }
+
     /**
      * @throws Exception
      */
@@ -180,7 +200,7 @@ class ChargeService extends BaseService
                 'query' => $params
             ], $this->headers);
             $data = json_decode($response->getBody(), true);
-            $charges = array_map([$this, 'addObjectId'], $data['data']);
+            $charges = $this->addObjectId($data['data']);
             $pagination = $data['meta']['pagination'] ?? [];
             unset($pagination['links']);
             return [
@@ -299,5 +319,97 @@ class ChargeService extends BaseService
                 $params['bank_account_id'] = substr($params['bank_account_id'], 4);
             }
             return $params;
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function adjustChargeTip($chargeIdWithPrefix, $tipParams)
+    {
+        if (str_starts_with($chargeIdWithPrefix, 'ch_')) {
+            $chargeId = substr($chargeIdWithPrefix, 3);
+        }
+
+        if (str_starts_with($chargeIdWithPrefix, 'ach_')) {
+            throw new \Exception("Tip adjustment is not applicable for ACH charges.");
+        }
+
+        try {
+            $response = $this->client->request('POST', "charges/$chargeId/tip_adjustment", [
+                'json' => $tipParams
+            ], $this->headers);
+            $data = json_decode($response->getBody()->getContents(), true);
+            return $this->addObjectId($data['data']);
+        } catch (ClientException|ServerException $err) {
+            throw new Exception($this->manageError(['source' => 'API Tip adjust charge'], $err, true), $err->getCode());
+        } catch (GuzzleException|Throwable $err) {
+            throw new Exception($this->manageError(['source' => 'API Tip adjust charge'], $err), $err->getCode());
+        }
+    }
+
+    private function adjustChargeSplits($chargeIdWithPrefix, $splitParams)
+    {
+        $chargeIdWithPrefix = is_array($chargeIdWithPrefix) ? ($chargeIdWithPrefix['object_id'] ?? $chargeIdWithPrefix) : $chargeIdWithPrefix;
+
+        if (str_starts_with($chargeIdWithPrefix, 'ch_')) {
+            $chargeId = substr($chargeIdWithPrefix, 3);
+        }
+
+        if (str_starts_with($chargeIdWithPrefix, 'ach_')) {
+            throw new \Exception("Tip adjustment is not applicable for ACH charges.");
+        }
+
+        try {
+            $response = $this->client->request('PATCH', "charges/$chargeId/overwrite-split", [
+                'json' => $splitParams
+            ], $this->headers);
+            $data = json_decode($response->getBody()->getContents(), true);
+            return $this->addObjectId($data['data']);
+        } catch (ClientException|ServerException $err) {
+            throw new Exception($this->manageError(['source' => 'API Split adjust charge'], $err, true), $err->getCode());
+        } catch (GuzzleException|Throwable $err) {
+            throw new Exception($this->manageError(['source' => 'API Split adjust charge'], $err), $err->getCode());
+        }
+    }
+
+    private function listChargeSplits($params)
+    {
+        $queryParams = [
+            'limit' => $params['limit'] ?? 25,
+            'page' => $params['page'] ?? 1,
+            'search' => $params['search'] ?? [],
+        ];
+
+        try {
+            $response = $this->client->request('GET', "instructional_funding", [
+                'query' => $queryParams
+            ], $this->headers);
+            $data = json_decode($response->getBody()->getContents(), true);
+            return $this->addObjectId($data['data']);
+        } catch (ClientException|ServerException $err) {
+            throw new Exception($this->manageError(['source' => 'API List charge splits'], $err, true), $err->getCode());
+        } catch (GuzzleException|Throwable $err) {
+            throw new Exception($this->manageError(['source' => 'API List charge splits'], $err), $err->getCode());
+        }
+    }
+
+    private function createChargeSplit($splitParams)
+    {
+        $include = $splitParams['include'] ?? 'charge';
+
+        try {
+            $response = $this->client->request('POST', "instructional_funding", [
+                'json' => $splitParams,
+                'query' => [
+                    'include' => $include,
+                ],
+            ], $this->headers);
+            $data = json_decode($response->getBody()->getContents(), true);
+            return $this->addObjectId($data['data']);
+        } catch (ClientException|ServerException $err) {
+            throw new Exception($this->manageError(['source' => 'API Create charge split'], $err, true), $err->getCode());
+        } catch (GuzzleException|Throwable $err) {
+            throw new Exception($this->manageError(['source' => 'API Create charge split'], $err), $err->getCode());
+        }
     }
 }
