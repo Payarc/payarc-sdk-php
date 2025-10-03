@@ -115,6 +115,14 @@ SDK is build around object payarc. From this object you can access properties an
     retrieve - this function returns json object 'Charge' with details
     list - returns an object with attribute 'charges' a list of json object holding information for charges and object in attribute 'pagination'
     createRefund - function to perform a refund over existing charge
+    adjustSplits - function to modify splits for existing charge (Only for Merchants configured with instructional funding)
+    createSplit - function to create splits
+    listSplits - function to retrieves a list of instructional funding allocations associated with a specific merchant account.
+
+#### Service `Payarc->payee` is used to manipulate payees in the system. This Service has the following functions:
+    create - this function to create process of connecting your payee with Payarc
+    list - this function returns all payees for the current agent
+    delete - this function to delete payee record by id
 
 ### Service ``Payarc->customer``
 #### Service `Payarc->customer` is representing your customers with personal details, addresses and credit cards and/or bank accounts. Saved for future needs
@@ -171,9 +179,9 @@ try {
             'amount' => 2860,
             'currency' => 'usd',
             'source' => [
-                "card_number" => "4012******5439",
-                "exp_month" => "03",
-                "exp_year" => "2025",
+                'card_number' => '4012******5439',
+                'exp_month' => '03',
+                'exp_year' => '2025',
             ]
         ],
     );
@@ -227,6 +235,195 @@ try {
     echo "Error detected: " . $e->getMessage() . "\n";
 }
 ```
+
+### Example: Create a Charge with Split (Instructional Funding)
+
+This example demonstrates how to create a charge with split instructions.
+Merchants configured with instructional funding are required to include the splits array in the request payload.
+At least one valid split instruction must be provided — otherwise, the request may result in errors and could delay funding of the transaction.
+
+```php
+try {
+    $charge = $payarc->charges->create(
+        [
+            'amount' => 120,
+            'currency' => 'usd',
+            'source' => [
+                'card_number' => '4012******5439',
+                'exp_month' => '03',
+                'exp_year" => '2025'',
+                'splits' => [
+                    [
+                        'mid' => '070990*******900',
+                        'amount' => 20,
+                        'description' => 'Application fee'
+                    ],
+                ],
+            ]
+        ],
+    );
+    echo "Charge created: " . json_encode($charge) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+
+### Example: Create Split Instructional Funding
+
+This example demonstrates how to transfer money to my payees via instructional funding
+
+```php
+try {
+    $charge = $payarc->charges->createSplit(
+                [
+                    'mid' => '070990*******900',
+                    'amount' => 20,
+                    'description' => 'Application fee'
+                ],
+        );
+    echo "Charge created: " . json_encode($charge) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+
+### Example: Adjust Splits for Charge with Instructional Funding
+
+This example demonstrates how to adjust splits for an existing charge with instructional funding by charge id.
+
+```php
+try {
+    $charge = $payarc->charges->adjustSplits(
+        'ch_AnonymizedChargeID',
+        'splits' => [
+                        [
+                            'mid' => '070990*******900',
+                            'amount' => 20,
+                            'description' => 'Application fee'
+                        ],
+                    ]
+        );
+    echo "Charge splits adjusted successfully: " . json_encode($charge) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+### Example: Listing Splits for Charge with Instructional Funding
+
+This example demonstrates how to list splits for an existing charge with instructional funding by charge id.
+It provides a detailed breakdown of the amount or percentage assigned to each allocation, along with its status and timestamps.
+
+```php
+try {
+    $params = [
+        'limit' => 10,
+        'page' => 1,
+        'search' => []
+    ];
+    $charge = $payarc->charges->listSplits($params);
+    echo "Charge splits listed successfully: " . json_encode($charge) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+
+### Example: Add a Tip to a Charge
+
+This example demonstrates how to add a tip to an existing charge.
+
+```php
+try {
+    $charge = $payarc->charges->tipAdjust(
+        'ch_AnonymizedChargeID',
+        [
+            'tip' => 20,
+        ],
+    );
+    echo "Tip adjusted successfully: " . json_encode($charge) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+
+## Manage Payee
+
+### Create new Payee
+
+In the process of connecting your payee with Payarc, a selection is made based on Payarc's criteria. The process begins with filling information for the payee and creating an entry in the database. Here is an example of how this process could start:
+
+```php
+    $payeeData = [
+        'type' => 'sole_prop', // Allowed: 'sole_prop' or 'business'
+        'personal_info' => [
+            'first_name' => 'PayeeName',
+            'last_name' => 'PayeeLast',
+            'ssn' => '#########',
+            'dob' => 'YYYY-MM-DD'
+        ],
+        'business_info' => [
+            'legal_name' => 'Payee Business Name',
+            'ein' => '##-#######',
+            'irs_filing_type' => 'A' // See IRS filing type codes below
+                                    // "A" - Foreign Entity Verification Pending
+                                    // "B" - Foreign Entity Identified before 1/1/11
+                                    // "C" - Non Profit Verified
+                                    // "D" - Non Profit Verification Pending
+                                    // "F" - Foreign Entity Verified
+                                    // "G" - Government Entity
+                                    // "J" - Financial Institution
+                                    // "N" - Not Excluded
+        ],
+        'contact_info' => [
+            'email' => 'payee@example.com',
+            'phone_number' => '1234567890'
+        ],
+        'address_info' => [
+            'street' => '123 Test St',
+            'city' => 'Test City',
+            'zip_code' => '12345',
+            'county_code' => 'NY'
+        ],
+        'banking_info' => [
+            'dda' => '123456789',
+            'routing' => '987654321'
+        ],
+        'foundation_date' => 'YYYY-MM-DD',
+        'date_incorporated' => 'YYYY-MM-DD'
+    ];
+    
+    try {
+        $result = $payarc->payee->create($payeeData);
+        echo 'Submitted Payee: ';
+    } catch (Exception $ex) {
+        echo 'Error detected: ' . $ex->getMessage();
+    }
+```
+
+### Retrieve Information for Payees
+
+List all payees for the current agent:
+
+```php
+try {
+    $res = $payarc->payee->list();
+    echo 'List of payees: ';
+} catch (Exception $error) {
+    echo 'Error detected: ' . $error->getMessage();
+}
+```
+
+### Example: Delete a Payee
+This example demonstrates how to delete an existing payee when only the ID is known:
+
+```php
+try {
+    $obj = $payarc->payee->delete('appy_AnonymizedPayeeID');
+    echo 'Payee deleted successfully: ';
+} catch (Exception $error) {
+    echo 'Error detected: ' . $error->getMessage();
+}
+```
+
 ### Example: Create a Charge by Bank account ID
 
 This example shows how to create an ACH charge when you know the bank account 
@@ -1179,5 +1376,6 @@ try {
     echo "Error detected: " . $e->getMessage() . "\n";
 }
 ```
+## License
 
-## License [MIT](LICENSE)
+Licensed under the [MIT](LICENSE) license.
