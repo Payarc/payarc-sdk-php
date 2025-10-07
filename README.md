@@ -102,6 +102,7 @@ SDK is build around object payarc. From this object you can access properties an
 
 ### Object `Payarc` has the following services:
     charges - to manipulate payments
+    batches - to manipulate batches
     customers - to manipulate customers
     deposits - to manipulate deposits
     applications - to manipulate candidate merchants
@@ -109,7 +110,11 @@ SDK is build around object payarc. From this object you can access properties an
     billing
        - plan - to manipulate plans
        - plan_subscription - to manipulate Plan subscriptions
+    disputes - to manipulate disputes
+    user_settings - to manipulate user settings
+    payarcConnect - to interact with a terminal running Payarc Connect
 
+### Service ``Payarc->charges``
 #### Service `Payarc->charges` is used to manipulate payments in the system. This Service has the following functions:
     create - this function will create a payment intent or charge accepting various configurations and parameters. See examples for some use cases. 
     retrieve - this function returns json object 'Charge' with details
@@ -123,6 +128,11 @@ SDK is build around object payarc. From this object you can access properties an
     create - this function to create process of connecting your payee with Payarc
     list - this function returns all payees for the current agent
     delete - this function to delete payee record by id
+
+### Service ``Payarc->batches``
+#### Service `Payarc->batches` is used to manipulate payments in the system. This Service has the following functions:
+    retrieve - this function returns json object 'Batch' with details
+    list - returns an object with attribute 'batches' a list of json object holding information for batches and object in attribute 'pagination'
 
 ### Service ``Payarc->customer``
 #### Service `Payarc->customer` is representing your customers with personal details, addresses and credit cards and/or bank accounts. Saved for future needs
@@ -160,8 +170,12 @@ This Service is aggregating other services responsible for recurrent payments. N
     create_subscription: issue a subscription for a customer from a plan.
 Based on plans you can create subscription. Time scheduled job will request and collect payments (charges) according plan schedule from customer.
 
-### Service `Payarc->batches`
-This service is used by Agents and ISVs to retrieve information on batches.
+### Service `Payarc->user_settings->agent->webhooks`
+#### This Service is used to manipulate user settings in the system. This SERVICE has methods for:
+    create - this function will create object stored in the database for webhooks in form of key value pair,
+    list - this function allows you to search amongst user settings you had created,
+    update - this function allows you to modify attributes of user settings object,
+    delete - this function allows you to delete user settings object.
 
 ## Creating a Charge
 ### Example: Create a Charge with Minimum Information
@@ -1193,6 +1207,80 @@ try {
     ]);
 
     echo "Agent deposits summary: " . json_encode($summary) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+## Managing Webhooks on Agent Level
+#### Webhooks management is available for agents only. To use this functionality you need to provide agent token on the constructor of the SDK.
+#### There are 4 type of webhooks that could be created:
+
+| Enum Value                                          | Keys                              | Description                          |
+|-----------------------------------------------------|-----------------------------------|--------------------------------------|
+| `UserSettingKey::ONBOARDING_WEBHOOK`                | merchant.onboarded.webhook        | Onboarding Webhook URL               |
+| `UserSettingKey::LEAD_UPDATE_WEBHOOK`               | lead.updated.webhook              | Lead Update Webhook URL              |
+| `UserSettingKey::LEAD_UPDATE_CATEGORY_WEBHOOK`      | lead.category.updated.webhook     | Lead Category Update Webhook URL     |
+| `UserSettingKey::LEAD_UNDERWRITING_UPDATED_WEBHOOK` | lead.underwriting.updated.webhook | Lead Underwriting Update Webhook URL |
+
+### Example: Create Webhook
+This example demonstrates how to create a webhook:
+```php
+try {
+    $webhookCreate = $payarc->user_settings->agent->webhooks->create([
+        "key" =>  UserSettingKey::ONBOARDING_WEBHOOK,
+        "value" => "www.example.com"
+    ]);
+    echo "Webhook created: " . json_encode($webhookCreate, JSON_PRETTY_PRINT) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+### Example: List Webhooks
+This example demonstrates how to list all webhooks:
+```php
+try {
+     $webhookList = $payarc->user_settings->agent->webhooks->list();
+     echo "Webhooks: " . json_encode($webhookList, JSON_PRETTY_PRINT) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+### Example: Update Webhook
+This example demonstrates how to update a webhook:
+```php
+try {
+    $webhookUpdated = $payarc->user_settings->agent->webhooks->update([
+        "key" =>  UserSettingKey::ONBOARDING_WEBHOOK,
+        "value" => "www.example.com"
+    ]);
+    echo "Webhook updated: " . json_encode($webhookUpdated, JSON_PRETTY_PRINT) . "\n";
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+This example demonstrates how to update a webhook by object:
+```php
+try {
+    $webhookList = $payarc->user_settings->agent->webhooks->list();
+    $webhookToUpdate = $webhookList[0] ?? null;
+    if($webhookToUpdate != null){
+        $updatedWebhook = $webhookToUpdate['update']('www.example2.com');
+        echo "Webhook updated: " . json_encode($updatedWebhook, JSON_PRETTY_PRINT) . "\n";
+    } else {
+        echo 'Webhook not found';
+    }
+} catch (Throwable $e) {
+    echo "Error detected: " . $e->getMessage() . "\n";
+}
+```
+### Example: Delete Webhook
+This example demonstrates how to delete a webhook:
+```php
+try {
+    $webhookDeleted = $payarc->user_settings->agent->webhooks->delete([
+        "key" => UserSettingKey::ONBOARDING_WEBHOOK,
+    ]);
+    echo "Webhook deleted: " . $webhookDeleted . "\n";
 } catch (Throwable $e) {
     echo "Error detected: " . $e->getMessage() . "\n";
 }
