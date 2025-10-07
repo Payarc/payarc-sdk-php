@@ -25,6 +25,7 @@ class CoreServiceFactory extends BaseServiceFactory
             ]
         ],
         'payarcConnect' => PayarcConnectService::class,
+        'payee' => PayeeService::class,
     ];
 
     public function __construct($client)
