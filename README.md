@@ -170,7 +170,7 @@ This Service is aggregating other services responsible for recurrent payments. N
     create_subscription: issue a subscription for a customer from a plan.
 Based on plans you can create subscription. Time scheduled job will request and collect payments (charges) according plan schedule from customer.
 
-### Service `Payarc->user_settings->agent->webhooks`
+### Service `Payarc->user_settings`
 #### This Service is used to manipulate user settings in the system. This SERVICE has methods for:
     create - this function will create object stored in the database for webhooks in form of key value pair,
     list - this function allows you to search amongst user settings you had created,
@@ -1215,12 +1215,12 @@ try {
 #### Webhooks management is available for agents only. To use this functionality you need to provide agent token on the constructor of the SDK.
 #### There are 4 type of webhooks that could be created:
 
-| Enum Value                                      | Description                       |
-|-------------------------------------------------|-----------------------------------|
-| `UserSettingKey::ONBOARDING_WEBHOOK`           | Onboarding Webhook URL            |
-| `UserSettingKey::LEAD_UPDATE_WEBHOOK`         | Lead Update Webhook URL           |
-| `UserSettingKey::LEAD_UPDATE_CATEGORY_WEBHOOK`| Lead Category Update Webhook URL  |
-| `UserSettingKey::LEAD_UNDERWRITING_UPDATED_WEBHOOK` | Lead Underwriting Update Webhook URL |
+| Enum Value                                          | Keys                              | Description                          |
+|-----------------------------------------------------|-----------------------------------|--------------------------------------|
+| `UserSettingKey::ONBOARDING_WEBHOOK`                | merchant.onboarded.webhook        | Onboarding Webhook URL               |
+| `UserSettingKey::LEAD_UPDATE_WEBHOOK`               | lead.updated.webhook              | Lead Update Webhook URL              |
+| `UserSettingKey::LEAD_UPDATE_CATEGORY_WEBHOOK`      | lead.category.updated.webhook     | Lead Category Update Webhook URL     |
+| `UserSettingKey::LEAD_UNDERWRITING_UPDATED_WEBHOOK` | lead.underwriting.updated.webhook | Lead Underwriting Update Webhook URL |
 
 ### Example: Create Webhook
 This example demonstrates how to create a webhook:

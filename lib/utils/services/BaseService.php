@@ -66,7 +66,7 @@ abstract class BaseService
     protected function updateSubscription($subscription, $newData){}
 
     //User Settings
-    protected function setWebhook(array $userSettings, $newData) {}
+    protected function setWebhook(array $userSettings) {}
 
     public function addObjectId(&$obj)
     {

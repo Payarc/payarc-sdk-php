@@ -14,7 +14,7 @@ class WebhookService extends BaseService
     /**
      * @throws Exception
      */
-    public function create($userSettings=[]): array
+    public function create($userSettings = []): array
     {
         return $this->setWebhook($userSettings);
     }
@@ -48,9 +48,11 @@ class WebhookService extends BaseService
      */
     public function listWebhooks()
     {
+        $headers = $this->headers;
+        $headers['Authorization'] = 'Bearer ' . $this->client->getBearerTokenAgent();
+
         try {
-            $this->headers['Authorization'] = 'Bearer ' . $this->client->getBearerTokenAgent();
-            $response = $this->client->request('GET', 'my-user-settings', ['query' => []], $this->headers);
+            $response = $this->client->request('GET', 'my-user-settings', ['query' => []], $headers);
             $data = json_decode($response->getBody(), true);
             return $this->addObjectId($data['data']);
         } catch (ClientException | ServerException $err) {
@@ -66,18 +68,19 @@ class WebhookService extends BaseService
      * @return array
      * @throws Exception
      */
-    public function setWebhook(array $userSettings = [], $newData = null): array
+    public function setWebhook(array $userSettings): array
     {
+        $headers = $this->headers;
+        $headers['Authorization'] = 'Bearer ' . $this->client->getBearerTokenAgent();
+
         try {
-            if ($newData !== null) {
-                $userSettings['value'] = $newData;
-            }
-            $this->headers['Authorization'] = 'Bearer ' . $this->client->getBearerTokenAgent();
             $response = $this->client->request('POST', 'my-user-settings', [
                 'json' => $userSettings
-            ], $this ->headers);
+            ], $headers);
             $data = json_decode($response->getBody(), true);
+
             return $this->addObjectId($data['data']);
+
         } catch (ClientException | ServerException $err) {
             throw new Exception($this->manageError(['source' => 'API set webhook setting'], $err, true), $err->getCode());
         } catch (GuzzleException | Throwable $err) {
@@ -90,14 +93,18 @@ class WebhookService extends BaseService
      * @return bool
      * @throws Exception
      */
-    public function deleteWebhookSetting(array $userSettings = []): bool
+    public function deleteWebhookSetting(array $userSettings): bool
     {
+        $headers = $this->headers;
+        $headers['Authorization'] = 'Bearer ' . $this->client->getBearerTokenAgent();
+
         try {
-            $this->headers['Authorization'] = 'Bearer ' . $this->client->getBearerTokenAgent();
             $response = $this->client->request('DELETE', 'my-user-settings', [
                 'json' => $userSettings
-            ], $this ->headers);
+            ], $headers);
+
             return $response->getStatusCode() === 204;
+
         } catch (ClientException | ServerException $err) {
             throw new Exception($this->manageError(['source' => 'API delete webhook setting'], $err, true), $err->getCode());
         } catch (GuzzleException | Throwable $err) {
