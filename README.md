@@ -170,7 +170,7 @@ This Service is aggregating other services responsible for recurrent payments. N
     create_subscription: issue a subscription for a customer from a plan.
 Based on plans you can create subscription. Time scheduled job will request and collect payments (charges) according plan schedule from customer.
 
-### Service `Payarc->user_settings`
+### Service `Payarc->user_settings->agent->webhooks`
 #### This Service is used to manipulate user settings in the system. This SERVICE has methods for:
     create - this function will create object stored in the database for webhooks in form of key value pair,
     list - this function allows you to search amongst user settings you had created,
